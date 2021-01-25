@@ -38,11 +38,11 @@ server_name = None
 muterole = None
 
 
-def extract(userid):
-        userid = userid[:-1]
-        userid = userid[3:]
+def extract_user_and_role(user_and_role_id):
+        user_and_role_id = user_and_role_id[:-1]
+        user_and_role_id = user_and_role_id[3:]
 
-        return userid
+        return user_and_role_id
 
 def extract_channel(channelid):
         channelid = channelid[:-1]
@@ -52,21 +52,12 @@ def extract_channel(channelid):
 
 def extract_string(args):
 
-        textlist = list(args)
-
-        string = ""
-        for word in textlist:
-                string = string + word + " "
-
-        return string
-
-def extract_to_string(args):
-
         var = ""
         for i in args:
                 var = var + i + " "
 
         return var
+
 
 
 
@@ -119,12 +110,12 @@ async def on_member_join(member):
                 name = f"Welcome {member.name}#{member.discriminator}"
                 members = f"server now has {member_number} members!!!"
 
-        #else:
+        else:
 
-        title = f"WELCOME TO {server.name}"
-        name = f"Welcome {member.name}#{member.discriminator}"
-        welcome_message = default_welcome_message
-        members = f"server now has {member_number} members!!!"
+                title = f"WELCOME TO {server.name}"
+                name = f"Welcome {member.name}#{member.discriminator}"
+                welcome_message = default_welcome_message
+                members = f"server now has {member_number} members!!!"
 
 
         embeded = discord.Embed(title=title, description=None, color=0x8871bf)
@@ -148,53 +139,6 @@ async def on_member_join(member):
                 # sends the dm and takes the members name from member taken as an argument
                 f'Hiiiiiiiiiii {member.name}, welcomeeeeeeeee to icyyyyyy\'s serverrr, hope you enjoy your stay :)'
         )
-
-
-
-@bot.command(name="welcome_channel")
-async def on_message(ctx, *args):
-
-        global welcome_channel
-        global server_name
-
-        welp = args
-        channel_id = extract_channel(welp[0])
-
-        server_name = ctx.author.guild.name
-        welcome_channel = await commands.TextChannelConverter().convert(ctx, channel_id)
-
-
-        print(f"command: \"welcome_channel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        await ctx.send(f"<#{channel_id}> has been set as the welcoming channel")
-
-
-
-@bot.command(name="welcome_message")
-async def on_message(ctx, *args):
-
-        global welcome_message
-        welcome_message = extract_string(args)
-
-        print(f"command: \"welcome_message\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        await ctx.send(f"Icy will send the message \"{welcome_message}\" when someone joins the server")
-
-
-
-@bot.command(name="default_welcome_message")
-async def on_message(ctx):
-
-        global welcome_message
-        global default_welcome_message
-
-        welcome_message = default_welcome_message
-
-        print(f"command: \"default_welcome_message\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        await ctx.send(f"Icy will send the message \"{welcome_message}\" when someone joins the server")
-
-
 
 
 
@@ -253,6 +197,53 @@ async def on_member_remove(member):
 
 
 
+
+
+@bot.command(name="welcome_channel")
+async def on_message(ctx, *args):
+
+        global welcome_channel
+        global server_name
+
+        welp = args
+        channel_id = extract_channel(welp[0])
+
+        server_name = ctx.author.guild.name
+        welcome_channel = await commands.TextChannelConverter().convert(ctx, channel_id)
+
+
+        print(f"command: \"welcome_channel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+
+        await ctx.send(f"<#{channel_id}> has been set as the welcoming channel")
+
+
+
+@bot.command(name="welcome_message")
+async def on_message(ctx, *args):
+
+        global welcome_message
+        welcome_message = extract_string(args)
+
+        print(f"command: \"welcome_message\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+
+        await ctx.send(f"Icy will send the message \"{welcome_message}\" when someone joins the server")
+
+
+
+@bot.command(name="default_welcome_message")
+async def on_message(ctx):
+
+        global welcome_message
+        global default_welcome_message
+
+        welcome_message = default_welcome_message
+
+        print(f"command: \"default_welcome_message\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+
+        await ctx.send(f"Icy will send the message \"{welcome_message}\" when someone joins the server")
+
+
+
 @bot.command(name="goodbye_channel")
 async def on_message(ctx, *args):
 
@@ -305,22 +296,17 @@ async def on_message(ctx, *args):
         
         global autoroles
 
-        autoroles_raw = list(args)
-        roles = extract_to_string(args)
+        autoroles_raw = list(args)# the list containing mentioned roles
+        roles = extract_string(args)# gets the roles as string
 
-        autoroles_id = []
 
         for i in autoroles_raw:
-                role = extract(i)
-                autoroles_id.append(role)
+                role_id = extract_user_and_role(i)# gets the role id
+                role = await commands.RoleConverter().convert(ctx, role_id)# converts id into a role object
 
-        for role_id in autoroles_id:
-                role = await commands.RoleConverter().convert(ctx, role_id)
+                autoroles.append(role)# adds role into the tuple
 
-                autoroles.append(role)
-
-        print(autoroles)
-
+        # confirmation in the chat
         await ctx.send(f"icy will add {roles}, when a new memer joins")
 
 
@@ -588,7 +574,7 @@ async def on_message(ctx, *args):
         global muterole# gets the global varriable consisting the mute role
 
         welp = args
-        userid = extract(welp[0])# gets the userid from the mentioned user string format
+        userid = extract_user_and_role(welp[0])# gets the userid from the mentioned user string format
 
 
         time_of_message = ctx.message.created_at# gets the time at which the message was sent by author
@@ -600,7 +586,8 @@ async def on_message(ctx, *args):
 
         timedelta = datetime.timedelta()# creates an empty time lenght to be added into later
 
-
+        
+        # block to extract the time
         for i in delay:# selects each word from the delay which were split by spaces in the original message
                 
                 # if the content is in the format of time
@@ -645,6 +632,8 @@ async def on_message(ctx, *args):
 
         time_unmute = time_of_message + timedelta# time to unmute the user
 
+
+        # block to mute and time the unmute
         try:
 
                 member = await commands.MemberConverter().convert(ctx, userid)# converts userid into a member object
@@ -705,31 +694,22 @@ async def on_message(ctx, *args):
 @bot.command(name="unmute", help="unmutes the mentioned user")
 async def on_message(ctx, *args):
 
-        global muterole
+        global muterole# gets the global mute role
 
-        welp = args
+
+        user_id = extract_user_and_role(args[0])# gets the user id
 
         try:
+                # converts the id into the member object
+                member = await commands.MemberConverter().convert(ctx, user_id)
 
-                user_id = extract(welp[0])
-
-                try:
-                        member = await commands.MemberConverter().convert(ctx, user_id)
-
-                except:
-                        embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exists", color=0x090202)
-                        await ctx.send(embed=embeded)
-
-                try:                        
-                        await member.remove_roles(muterole)
-                        await ctx.send(f"{member.name} unmuted")
-
-                except:
-                        embeded = discord.Embed(title="ERROR", description="user already unmuted", color=0x090202)
-                        await ctx.send(embed=embeded)
+                # removes the mute role from user
+                await member.remove_roles(muterole)
+                await ctx.send(f"{member.name} has been unmuted")
 
         except:
-                embeded = discord.Embed(title="ERROR", description="there a big problemo", color=0x090202)
+                # if the mentioned user is invalid
+                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exists", color=0x090202)
                 await ctx.send(embed=embeded)
 
 
@@ -744,7 +724,7 @@ async def on_message(ctx, *args):
 
         if welp:# checks whether other person has been mentioned
 
-                userid = extract(welp[0])# gets the user id from mentioned
+                userid = extract_user_and_role(welp[0])# gets the user id from mentioned
                 mentioned = await commands.MemberConverter().convert(ctx, userid)# converts the user id to a member object
 
 
@@ -946,7 +926,7 @@ async def on_message(ctx, *args):
 
         if welp:# checks whether another user is mentioned
 
-                userid = extract(welp[0])# gets the user id from mentioned
+                userid = extract_user_and_role(welp[0])# gets the user id from mentioned
                 mentioned = await commands.MemberConverter().convert(ctx, userid)# converts the user id to a member object
 
                 dance_gifs = [
@@ -1091,7 +1071,7 @@ async def on_message(ctx, *args):
 
         if welp:# checks whether another user is mentioned
 
-                userid = extract(welp[0])# gets the user id from mentioned
+                userid = extract_user_and_role(welp[0])# gets the user id from mentioned
                 mentioned = await commands.MemberConverter().convert(ctx, userid)# converts the user id to a member object
 
 
@@ -1246,7 +1226,7 @@ async def on_message(ctx, *args):
         # checks whether another user is mentioned
         try:
 
-                userid = extract(welp[0])# gets the user id from mentioned
+                userid = extract_user_and_role(welp[0])# gets the user id from mentioned
                 mentioned = await commands.MemberConverter().convert(ctx, userid)# converts the user id to a member object
 
 
@@ -1452,7 +1432,7 @@ async def on_message(ctx):
 async def on_message(ctx, *args):
 
         welp = list(args)
-        userid = extract(welp[0])
+        userid = extract_user_and_role(welp[0])
 
         usermember = await commands.MemberConverter().convert(ctx, userid)
 
