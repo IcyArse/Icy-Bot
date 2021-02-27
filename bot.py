@@ -1,7 +1,8 @@
 import os
 import random
-import discord
+import json
 import praw
+import discord
 
 from discord import client
 from discord import embeds
@@ -69,6 +70,9 @@ if True:
         send_goodbye_thumbnail = True
         custom_goodbye_thumbnail = None
 
+        first_welcome_set = True
+        first_goodbye_set = True
+
 
         server_name = None
 
@@ -78,6 +82,12 @@ if True:
         thoughtlimit = 1
         memelimit = 1
         catlimit = 1
+
+        testvar = None
+        testvar2 = None
+
+        dataindexdict = None
+        loaddatavar = None
 
 
 
@@ -102,7 +112,89 @@ def extract_string(args):
 
         return var
 
+def getjson(serverid, variable, variable_string):
 
+        global dataindexdict
+        global loaddatavar
+
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdata.json", "r") as jsonfile:
+
+                if loaddatavar:
+                        loaddata = loaddatavar
+                else:
+                        loaddata = json.load(jsonfile)
+
+                server_in_file = False
+
+                print(f"SERVER ID> {serverid}")
+
+
+                for i in loaddata["guilddata"]:
+                        #loaddata["guilddata"]
+
+                        print("ye")
+                        if i[serverid]:
+
+                                print(i)
+                                print("FUCK YEA")
+
+
+                                server_in_file = True
+                                dataindex = loaddata["guilddata"].index(i)
+                                dataindexdict = dataindex
+
+                                try:
+
+                                        print("JUST GETTING THE VARRIABLE 0")
+                                        variable = i.get(serverid).get(variable_string)
+
+                                        print("JUST GETTING THE VARRIABLE")
+                                        break
+                                except:
+
+                                        print("THE VARIABLE ISN'T PRESENT 0")
+                                        var = {variable_string: variable}
+
+                                        i.get(serverid).update(var)
+                                        variable = i[serverid].get(variable_string)
+
+                                        print("THE VARIABLE ISN'T PRESENT")
+                                        break
+
+
+                if server_in_file == False:
+
+                        print("THE SERVER ISN'T PRESENT IN THE LIST 0")
+                        loaddata["guilddata"].append({serverid: {}})
+
+                        dataindex = -1
+                        dataindexdict.update({variable_string: dataindex})
+
+                        loaddata["guilddata"][-1][serverid].update({variable_string: variable})
+                        variable = loaddata["guilddata"][-1][serverid].get(variable_string)
+                        print("THE SERVER ISN'T PRESENT IN THE LIST")
+
+        
+                loaddatavar = loaddata
+                return variable
+
+def savejson(serverid, newvalue, variable_string):
+
+        global dataindexdict
+        global loaddatavar
+
+        dataindex = dataindexdict
+        loaddata = loaddatavar
+
+        #UPDATING THE VARIALE
+        loaddata["guilddata"][dataindex][serverid][variable_string] = newvalue#update({variable_string: newvalue})
+
+
+        #DUMPS
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdata.json", "w") as dumpfile:
+                json.dump(loaddata, dumpfile, indent=8)
+
+        print("IT SAVED BABY")
 
 
 
@@ -117,6 +209,22 @@ async def on_ready():
         guild = discord.utils.get(bot.guilds, name=GUILD)# gets the guild name using the .env file and the get function from discord.utils
         memberss = [member.name for member in guild.members]# creates a list of members
         print(f'server members are: {memberss}')# prints the members
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -145,11 +253,39 @@ async def on_member_join(member):
         global server_name
         global autoroles
 
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(member.guild.id)
+
+        if True:
+
+                welcome_channel           = getjson(serverid, welcome_channel, "welcome_channel")
+                custom_welcome_message    = getjson(serverid, custom_welcome_message, "custom_welcome_message")
+                send_welcome_gif          = getjson(serverid, send_welcome_gif, "send_welcome_gif")
+                custom_welcome_gif        = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
+                send_welcome_message      = getjson(serverid, send_welcome_message, "send_welcome_message")
+                welcome_member_count_show = getjson(serverid, welcome_member_count_show, "welcome_member_count_show")
+                send_welcome_emote        = getjson(serverid, send_welcome_emote, "send_welcome_emote")
+                custom_welcome_thumbnail  = getjson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+                send_welcome_thumbnail    = getjson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                send_welcome_dm           = getjson(serverid, send_welcome_dm, "send_welcome_dm")
+                custom_welcome_dm         = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
+                server_name               = getjson(serverid, server_name, "server_name")
+                autoroles                 = getjson(serverid, autoroles, "autoroles")
+
+                loaddatavar, dataindexdict = None, {}
+
+        # gets the server object using the server name got from the welcome_channel function
+        server = discord.utils.get(bot.guilds, name=server_name)
+
 
         if welcome_channel:
 
-                # gets the server object using the server name got from the welcome_channel function
-                server = discord.utils.get(bot.guilds, name=server_name)
+                welcome_channel = discord.utils.get(member.guild.channels, id=int(welcome_channel))# converts the channel id into a channel object
+
+                print(welcome_channel)
+
                 member_number = len(server.members)# gets the number of members in the server
 
                 if not send_welcome_message:
@@ -267,6 +403,8 @@ async def on_member_join(member):
 
 
 
+
+
 #sends goodbye message in the server
 @bot.event
 async def on_member_remove(member):
@@ -284,11 +422,34 @@ async def on_member_remove(member):
 
         global server_name
 
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(member.guild.id)
+
+        if True:
+
+                goodbye_channel           = getjson(serverid, goodbye_channel, "goodbye_channel")
+                custom_goodbye_message    = getjson(serverid, custom_goodbye_message, "custom_goodbye_message")
+                send_goodbye_gif          = getjson(serverid, send_goodbye_gif, "send_goodbye_gif")
+                custom_goodbye_gif        = getjson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+                send_goodbye_message      = getjson(serverid, send_goodbye_message, "send_goodbye_message")
+                goodbye_member_count_show = getjson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
+                send_goodbye_emote        = getjson(serverid, send_goodbye_emote, "send_goodbye_emote")
+                custom_goodbye_thumbnail  = getjson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
+                send_goodbye_thumbnail    = getjson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+                server_name               = getjson(serverid, server_name, "server_name")
+
+                loaddatavar, dataindexdict = None, {}
+
+        # gets the server object using the server name recieved from the welcome/goodbye channel command
+        server = discord.utils.get(bot.guilds, name=server_name)
+
 
         if goodbye_channel:
 
-                # gets the server object using the server name recieved from the welcome/goodbye channel command
-                server = discord.utils.get(bot.guilds, name=server_name)
+                goodbye_channel = discord.utils.get(server.channels, id=int(goodbye_channel))# converts the channel id into a channel object
+
                 member_number = len(server.members)# gets the number of server members
 
                 if not send_goodbye_message:
@@ -391,7 +552,71 @@ async def on_member_remove(member):
 async def on_message(ctx, *args):
 
         global welcome_channel
+
+        global custom_welcome_message
+        global send_welcome_gif
+        global custom_welcome_gif
+        global send_welcome_message
+        global welcome_member_count_show
+        global send_welcome_emote
+        global custom_welcome_thumbnail
+        global send_welcome_thumbnail
+        global send_welcome_dm
+        global custom_welcome_dm
+
         global server_name
+        global autoroles
+
+        global first_welcome_set
+
+        global loaddatavar
+        global dataindexdict
+
+
+        serverid = str(ctx.author.guild.id)
+        server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
+
+
+        if getjson(serverid, first_welcome_set, "first_welcome_set") == False:
+                first_welcome_set = False
+
+
+        if first_welcome_set:
+
+                first_welcome_set = False
+
+                disposable = getjson(serverid, first_welcome_set, "first_welcome_set")
+
+                savejson(serverid, custom_welcome_message, "custom_welcome_message")
+                savejson(serverid, send_welcome_gif, "send_welcome_gif")
+                savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
+                savejson(serverid, send_welcome_message, "send_welcome_message")
+                savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
+                savejson(serverid, send_welcome_emote, "send_welcome_emote")
+                savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+                savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                savejson(serverid, send_welcome_dm, "send_welcome_dm")
+                savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
+                savejson(serverid, autoroles, "autoroles")
+
+                savejson(serverid, False, "first_welcome_set")
+
+                loaddatavar, dataindexdict = None, {}
+
+
+
+        print(server_name)
+
+        #welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
+        print(welcome_channel)
+
+
+        welcome_channel = getjson(serverid, welcome_channel, "welcome_channel")
+        welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
+        print(welcome_channel)
+
+        server_name = getjson(serverid, server_name, "server_name")
+        server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
         if "None" in args[0] or "none" in args[0]:
 
@@ -402,23 +627,31 @@ async def on_message(ctx, *args):
 
         else:
 
-                channel_id = extract_channel(args[0])# gets the channel id from the arguments
+                welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
 
-                server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
                 try:
-                        welcome_channel = await commands.TextChannelConverter().convert(ctx, channel_id)# converts the channel id into a channel object
+                        try_this = await commands.TextChannelConverter().convert(ctx, welcome_channel)# converts the channel id into a channel object
 
 
                         print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
-                        await ctx.send(f"<#{channel_id}> channel will recieve the welcome messages")# confirms the command in the chat
+                        await ctx.send(f"<#{welcome_channel}> channel will recieve the welcome messages")# confirms the command in the chat
 
                 except:
                         heat_up_message = "The given channel doesn't exists, please make sure to tag the channel correctely"
 
                         embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
                         await ctx.send(embed=embeded)
+
+        print(loaddatavar)
+        print(dataindexdict)
+
+
+        savejson(serverid, welcome_channel, "welcome_channel")
+        savejson(serverid, server_name, "server_name")
+
+        loaddatavar, dataindexdict = None, {}
 
 
 
@@ -428,11 +661,21 @@ async def on_message(ctx, *args):
         global custom_welcome_message
         global send_welcome_message
 
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+
+        custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
+        send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
+
         custom_welcome_message = extract_string(args)# gets the message given by user and sets it as the global varriable
 
         if "None" in args[0] or "none" in args[0]:
 
                 custom_welcome_message = None
+
                 send_welcome_message = False
 
                 print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
@@ -440,11 +683,17 @@ async def on_message(ctx, *args):
                 await ctx.send(f"Icy won't send the welcome message when a user joins the server")
 
         else:
-
+                
                 send_welcome_message = True
+
                 print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
                 await ctx.send(f"The following message is set as the welcome message: \"{custom_welcome_message}\"")# confirms the command in the chat
+
+        savejson(serverid, custom_welcome_message, "custom_welcome_message")
+        savejson(serverid, send_welcome_message, "send_welcome_message")
+
+        loaddatavar, dataindexdict = None, {}
 
 
 
@@ -453,12 +702,22 @@ async def on_message(ctx):
 
         global send_welcome_message
 
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+        send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
+
         # a way to go back to the defualt welcome message
         send_welcome_message = True
+        
 
         print(f"command: \"resetwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
         await ctx.send(f"Icy will send the default message as the welcome message")# confirms the command in the chat
+
+        savejson(serverid, send_welcome_message, "send_welcome_message")
+        loaddatavar, dataindexdict = None, {}
 
 
 
@@ -467,6 +726,14 @@ async def on_message(ctx, *args):
 
         global custom_welcome_gif
         global send_welcome_gif
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        custom_welcome_gif = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
+        send_welcome_gif = getjson(serverid, send_welcome_gif, "send_welcome_gif")
 
         print(f"command: \"setwelcomegif\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
@@ -477,9 +744,17 @@ async def on_message(ctx, *args):
                 await ctx.send("Icy won't add a gif in the welcome message")
 
 
+        elif "True" in args or "True" in args:
+
+                send_welcome_gif = True
+
+                await ctx.send("Icy will add a gif in the welcome message")
+
+
         else:
                 
                 custom_welcome_gif = args
+                send_welcome_gif = True
 
                 try:
                         await ctx.send("The following gif will be used as welcoming gif:")
@@ -488,12 +763,24 @@ async def on_message(ctx, *args):
                 except:
                         await ctx.send("Invalid link. Please make sure to give the link of the gif location")
 
+        savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
+        savejson(serverid, send_welcome_gif, "send_welcome_gif")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="showwelcomemembercount")
 async def on_message(ctx, *args):
 
         global welcome_member_count_show
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        welcome_member_count_show = getjson(serverid, welcome_member_count_show, "welcome_member_count_show")
 
         if "True" in args[0] or "true" in args[0]:
                 welcome_member_count_show = True
@@ -515,12 +802,23 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="sendwelcomeemote")
 async def on_message(ctx, *args):
 
         global send_welcome_emote
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_welcome_emote = getjson(serverid, send_welcome_emote, "send_welcome_emote")
 
         if "True" in args[0] or "true" in args[0]:
                 send_welcome_emote = True
@@ -542,12 +840,23 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, send_welcome_emote, "send_welcome_emote")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="setwelcomethumbnail")
 async def on_message(ctx, *args):
 
         global custom_welcome_thumbnail
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        custom_welcome_thumbnail = getjson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
 
         if "None" in args[0] or "none" in args[0]:
                 custom_welcome_thumbnail = None
@@ -572,12 +881,23 @@ async def on_message(ctx, *args):
 
                         await ctx.send(embed=embeded)
 
+        savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="sendwelcomethumbnail")
 async def on_message(ctx, *args):
 
         global send_welcome_thumbnail
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_welcome_thumbnail = getjson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
 
         if "True" in args[0] or "true" in args[0]:
                 send_welcome_thumbnail = True
@@ -599,6 +919,10 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 
@@ -607,7 +931,54 @@ async def on_message(ctx, *args):
 async def on_message(ctx, *args):
 
         global goodbye_channel
+
+        global custom_goodbye_message
+        global send_goodbye_gif
+        global custom_goodbye_gif
+        global send_goodbye_message
+        global goodbye_member_count_show
+        global send_goodbye_emote
+        global custom_goodbye_thumbnail
+        global send_goodbye_thumbnail
+
         global server_name
+
+        global first_goodbye_set
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+        server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
+
+
+        if getjson(serverid, first_goodbye_set, "first_goodbye_set") == False:
+                first_goodbye_set = False
+
+
+        if first_goodbye_set:
+
+                first_goodbye_set = False
+
+                disposable = getjson(serverid, first_goodbye_set, "first_goodbye_set")
+
+                savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
+                savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
+                savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+                savejson(serverid, send_goodbye_message, "send_goodbye_message")
+                savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
+                savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
+                savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
+                savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+
+                savejson(serverid, False, "first_goodbye_set")
+
+                loaddatavar, dataindexdict = None, {}
+
+
+
+        goodbye_channel = getjson(serverid, goodbye_channel, "goodbye_channel")
+        server_name = getjson(serverid, server_name, "server_name")
 
         if "None" in args[0] or "none" in args[0]:
 
@@ -618,17 +989,16 @@ async def on_message(ctx, *args):
 
         else:
 
-                channel_id = extract_channel(args[0])# gets the channel id from the arguments
+                goodbye_channel = extract_channel(args[0])# gets the channel id from the arguments
 
-                server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
                 try:
-                        goodbye_channel = await commands.TextChannelConverter().convert(ctx, channel_id)# converts the channel id into a channel object
+                        test_goodbye_channel = await commands.TextChannelConverter().convert(ctx, goodbye_channel)# converts the channel id into a channel object
 
 
                         print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
-                        await ctx.send(f"<#{channel_id}> channel will recieve the welcome messages")# confirms the command in the chat
+                        await ctx.send(f"<#{goodbye_channel}> channel will recieve the welcome messages")# confirms the command in the chat
 
                 except:
 
@@ -636,6 +1006,11 @@ async def on_message(ctx, *args):
 
                         embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
                         await ctx.send(embed=embeded)
+
+        savejson(serverid, goodbye_channel, "goodbye_channel")
+        savejson(serverid, server_name, "server_name")
+
+        loaddatavar, dataindexdict = None, {}
 
 
 
@@ -645,6 +1020,14 @@ async def on_message(ctx, *args):
 
         global custom_goodbye_message
         global send_goodbye_message
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        custom_goodbye_message = getjson(serverid, custom_goodbye_message, "custom_goodbye_message")
+        send_goodbye_message = getjson(serverid, send_goodbye_message, "send_goodbye_message")
 
         custom_goodbye_message = extract_string(args)# gets the message given by user and sets it as the global varriable
 
@@ -663,12 +1046,24 @@ async def on_message(ctx, *args):
 
                 await ctx.send(f"The following message is set as the goodbye message: \"{custom_goodbye_message}\"")# confirms the command in the chat
 
+        savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
+        savejson(serverid, send_goodbye_message, "send_goodbye_message")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="resetgoodbyemessage")
 async def on_message(ctx):
 
         global send_goodbye_message
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_goodbye_message = getjson(serverid, send_goodbye_message, "send_goodbye_message")
 
         # a way to go back to the defualt goodbye message
         send_goodbye_message = True
@@ -677,6 +1072,10 @@ async def on_message(ctx):
 
         await ctx.send(f"Icy will send the default message as the goodbye message")# confirms the command in the chat
 
+        savejson(serverid, send_goodbye_message, "send_goodbye_message")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="setgoodbyegif")
@@ -684,6 +1083,14 @@ async def on_message(ctx, *args):
 
         global custom_goodbye_gif
         global send_goodbye_gif
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        custom_goodbye_gif = getjson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+        send_goodbye_gif = getjson(serverid, send_goodbye_gif, "send_goodbye_gif")
 
         if "None" in args[0] or "none" in args[0]:
 
@@ -703,12 +1110,24 @@ async def on_message(ctx, *args):
                 except:
                         await ctx.send("Invalid link. Please make sure to give the link of the gif location")
 
+        savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+        savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="showgoodbyemembercount")
 async def on_message(ctx, *args):
 
         global goodbye_member_count_show
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        goodbye_member_count_show = getjson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
 
         if "True" in args[0] or "true" in args[0]:
                 goodbye_member_count_show = True
@@ -730,12 +1149,23 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="sendgoodbyeemote")
 async def on_message(ctx, *args):
 
         global send_goodbye_emote
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_goodbye_emote = getjson(serverid, send_goodbye_emote, "send_goodbye_emote")
 
         if "True" in args[0] or "true" in args[0]:
                 send_goodbye_emote = True
@@ -757,12 +1187,23 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="setgoodbyethumbnail")
 async def on_message(ctx, *args):
 
         global custom_goodbye_thumbnail
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        custom_goodbye_thumbnail = getjson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
 
         if "None" in args[0] or "none" in args[0]:
 
@@ -788,12 +1229,23 @@ async def on_message(ctx, *args):
 
                         await ctx.send(embed=embeded)
 
+        savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command(name="sendgoodbyethumbnail")
 async def on_message(ctx, *args):
 
         global send_goodbye_thumbnail
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_goodbye_thumbnail = getjson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
 
         if "True" in args[0] or "true" in args[0]:
                 send_goodbye_thumbnail = True
@@ -815,6 +1267,10 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)
 
+        savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+
+        loaddatavar, dataindexdict = None, {}
+
 
 
 @bot.command("setwelcomedm")
@@ -822,6 +1278,14 @@ async def on_message(ctx, *args):
 
         global send_welcome_dm
         global custom_welcome_dm
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        send_welcome_dm = getjson(serverid, send_welcome_dm, "send_welcome_dm")
+        send_goodbye_gif = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
 
         if "None" in args[0] or "none" in args[0]:
                 send_welcome_dm = False
@@ -838,6 +1302,11 @@ async def on_message(ctx, *args):
                 print(f"command: \"setwelcomedm\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
                 
                 await ctx.send(f"Icy will send the following dm to the new user: \"{custom_welcome_dm}\"")
+
+        savejson(serverid, send_welcome_dm, "send_welcome_dm")
+        savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
+
+        loaddatavar, dataindexdict = None, {}
 
 
 
@@ -860,10 +1329,33 @@ async def on_message(ctx):
 
         global autoroles
 
+        global loaddatavar
+        global dataindexdict
 
 
         # sets the server variable as a guild object
         server = ctx.author.guild
+        serverid = str(server.id)
+
+
+        if True:
+                
+                        custom_welcome_message    = getjson(serverid, custom_welcome_message, "custom_welcome_message")
+                        send_welcome_gif          = getjson(serverid, send_welcome_gif, "send_welcome_gif")
+                        custom_welcome_gif        = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
+                        send_welcome_message      = getjson(serverid, send_welcome_message, "send_welcome_message")
+                        welcome_member_count_show = getjson(serverid, welcome_member_count_show, "welcome_member_count_show")
+                        send_welcome_emote        = getjson(serverid, send_welcome_emote, "send_welcome_emote")
+                        custom_welcome_thumbnail  = getjson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+                        send_welcome_thumbnail    = getjson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                        send_welcome_dm           = getjson(serverid, send_welcome_dm, "send_welcome_dm")
+                        custom_welcome_dm         = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
+                        autoroles                 = getjson(serverid, autoroles, "autoroles")
+
+                        loaddatavar, dataindexdict = None, {}
+
+
+
         member_number = len(server.members)# gets the number of members in the server
 
 
@@ -994,10 +1486,30 @@ async def on_message(ctx):
         global custom_goodbye_thumbnail
         global send_goodbye_thumbnail
 
+        global loaddatavar
+        global dataindexdict
 
 
         # sets the server variable as a guild object
         server = ctx.author.guild
+        serverid = str(server.id)
+
+
+        if True:
+
+                custom_goodbye_message    = getjson(serverid, custom_goodbye_message, "custom_goodbye_message")
+                send_goodbye_gif          = getjson(serverid, send_goodbye_gif, "send_goodbye_gif")
+                custom_goodbye_gif        = getjson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+                send_goodbye_message      = getjson(serverid, send_goodbye_message, "send_goodbye_message")
+                goodbye_member_count_show = getjson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
+                send_goodbye_emote        = getjson(serverid, send_goodbye_emote, "send_goodbye_emote")
+                custom_goodbye_thumbnail  = getjson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
+                send_goodbye_thumbnail    = getjson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+
+                loaddatavar, dataindexdict = None, {}
+
+
+
         member_number = len(server.members)# gets the number of server members
 
         if not send_goodbye_message:
@@ -2336,24 +2848,117 @@ async def on_message(ctx):
 
 #test function
 @bot.command(name="welp", help="testing command")
-async def on_message(ctx, *args):
+async def on_message(ctx):
 
-        welp = list(args)
-        userid = extract_user_and_role(welp[0])
+        global testvar
+        global loaddatavar
+        global dataindexdict
 
-        usermember = await commands.MemberConverter().convert(ctx, userid)
+        #with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\testbotdata.json", "r") as jsonfile:
+        #        loaddata = json.load(jsonfile)
+        #
+        #        serverid = str(ctx.author.guild.id)
+        #        server_in_file = False
+        #        print(f"SERVER ID> {serverid}")
+        #
+        #        
+        #
+        #        for i in loaddata["guilddata"]:
+        #                #loaddata["guilddata"]
+        #                #try:
+        #                print("ye")
+        #                if i[serverid]:
+        #                        print(i)
+        #                        print("FUCK YEA")
+        #                        server_in_file = True
+        #
+        #                        dataindex = loaddata["guilddata"].index(i)
+        #         
+        #                        try:
+        #                                print("JUST GETTING THE VARRIABLE 0")
+        #                                testvar = i.get(serverid).get("testvar")
+        #                                print("JUST GETTING THE VARRIABLE")
+        #                                break
+        #
+        #                        except:
+        #                                print("THE VARIABLE ISN'T PRESENT 0")
+        #                                var = {"testvar": "fuck ye THIS WORKS wasn't expecting really..."}
+        #
+        #                                i.get(serverid).update(var)
+        #                                testvar = i[serverid].get("testvar")
+        #
+        #                                print("THE VARIABLE ISN'T PRESENT")
+        #                                break
+        #
+        #                #except:
+        #                #        pass
+        #
+        #        if server_in_file == False:
+        #                print("THE SERVER ISN'T PRESENT IN THE LIST 0")
+        #                loaddata["guilddata"].append({serverid: {}})
+        #
+        #                dataindex = -1
+        #                loaddata["guilddata"][-1][serverid].update({"testvar": "fuck ye THIS WORKS wasn't expecting really..."})
+        #                testvar = loaddata["guilddata"][-1][serverid].get("testvar")
+        #                print("THE SERVER ISN'T PRESENT IN THE LIST")
+        #
+        #
+        #        
+        #        #print("MF")
+        #        #pass
 
-        await ctx.send(f"```name> {usermember.name}```")
-        await ctx.send(f"```id> {usermember.id}```")
-        await ctx.send(f"```time> {ctx.message.created_at}```")
 
+        serverid = str(ctx.author.guild.id)
+        testvar2 = None#"welpwelpwelpwelp"
+        testvar = getjson(serverid, testvar, "testvar")
+        testvar2 = getjson(serverid, testvar2, "testvar2")
+
+        await ctx.send(testvar)
+
+        savejson(serverid, "sexy", "testvar")
+        savejson(serverid, None, "testvar2")
+        loaddatavar, dataindexdict = None, {}
+
+
+
+        ##UPDATING THE VARIALE
+        #loaddata["guilddata"][dataindex][serverid].update({"testvar": "welpwelp"})
+        #
+        ##DUMPS
+        #with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\testbotdata.json", "w") as dumpfile:
+        #        json.dump(loaddata, dumpfile)
+        #
+        #
+        #        #loaddata["guilddata"][objectindex].get(serverid).update({"testvar": testvar})
+        #        #["guilddata"][dataindex][serverid].update({"testvar": "welpwelp"})
+
+
+
+        #with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\testbotdata.json", "w") as jsonfile:
+        #        
+        #        
+        #        
+        #        json.dump(loaddata, jsonfile)
+
+
+
+
+
+        #welp = list(args)
+        #userid = extract_user_and_role(welp[0])
+        #
+        #usermember = await commands.MemberConverter().convert(ctx, userid)
+        #
+        #await ctx.send(f"```name> {usermember.name}```")
+        #await ctx.send(f"```id> {usermember.id}```")
+        #await ctx.send(f"```time> {ctx.message.created_at}```")
+        #
         #embeded = discord.Embed(title="embed fuck yeah", desc="description just so you know", color=0x45b798)
         #embeded.add_field(name="first field- hopefully", value="fuck yeaaaa this is exciting is this first line- hope so", inline=False)
         #embeded.add_field(name="second one- maybeeeee", value="so is this second hopefully it is- nicenice yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", inline=True)
         #embeded.add_field(name="third one babyyyyyfggggnhgfhgfkgggggggggggy", value="A third- why not", inline=True)
-
+        #
         #await ctx.send(embed=embeded)
-        pass
 
 
 
