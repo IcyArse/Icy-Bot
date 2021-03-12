@@ -10,6 +10,7 @@ from discord import embeds
 from prawcore import auth
 
 import pytz
+import time
 import datetime
 
 
@@ -85,6 +86,10 @@ if True:
 
         testvar = None
         testvar2 = None
+
+        disposable = None
+
+        muted_user_roles = {}
 
         dataindexdict = None
         loaddatavar = None
@@ -216,12 +221,100 @@ async def on_ready():
 
 
 
+@bot.event
+async def on_guild_join(guild):
+        
+        global welcome_channel
+
+        global custom_welcome_message
+        global send_welcome_gif
+        global custom_welcome_gif
+        global send_welcome_message
+        global welcome_member_count_show
+        global send_welcome_emote
+        global custom_welcome_thumbnail
+        global send_welcome_thumbnail
+        global send_welcome_dm
+        global custom_welcome_dm
 
 
+        global goodbye_channel
+
+        global custom_goodbye_message
+        global send_goodbye_gif
+        global custom_goodbye_gif
+        global send_goodbye_message
+        global goodbye_member_count_show
+        global send_goodbye_emote
+        global custom_goodbye_thumbnail
+        global send_goodbye_thumbnail
+
+        global server_name
+        global autoroles
+
+        global muterole
+
+        global suggestion_num
+        global suggestions
+
+        global thoughtlimit
+        global memelimit
+        global catlimit
+
+        global disposable
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(guild.id)
+
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdata.json", "r") as jsonfile:
+                loaddata = json.load(jsonfile)
+                loaddata["guilddata"].append({serverid: {}})
+
+                loaddatavar = loaddata
+                dataindexdict = -1
 
 
+        #disposable = getjson(serverid, disposable, "disposable")
 
+        savejson(serverid, welcome_channel, "welcome_channel")
+        savejson(serverid, custom_welcome_message, "custom_welcome_message")
+        savejson(serverid, send_welcome_gif, "send_welcome_gif")
+        savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
+        savejson(serverid, send_welcome_message, "send_welcome_message")
+        savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
+        savejson(serverid, send_welcome_emote, "send_welcome_emote")
+        savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+        savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+        savejson(serverid, send_welcome_dm, "send_welcome_dm")
+        savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
+        savejson(serverid, autoroles, "autoroles")
 
+        savejson(serverid, goodbye_channel, "goodbye_channel")
+        savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
+        savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
+        savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+        savejson(serverid, send_goodbye_message, "send_goodbye_message")
+        savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
+        savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
+        savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
+        savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+
+        savejson(serverid, muterole, "muterole")
+
+        savejson(serverid, suggestion_num, "suggestion_num")
+        savejson(serverid, suggestions, "suggestions")
+
+        savejson(serverid, thoughtlimit, "thoughtlimit")
+        savejson(serverid, memelimit, "memelimit")
+        savejson(serverid, catlimit, "catlimit")
+
+        savejson(serverid, muted_user_roles, "muted_user_roles")
+        
+        
+        
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -274,7 +367,7 @@ async def on_member_join(member):
                 server_name               = getjson(serverid, server_name, "server_name")
                 autoroles                 = getjson(serverid, autoroles, "autoroles")
 
-                loaddatavar, dataindexdict = None, {}
+                loaddatavar, dataindexdict = None, None
 
         # gets the server object using the server name got from the welcome_channel function
         server = discord.utils.get(bot.guilds, name=server_name)
@@ -440,7 +533,7 @@ async def on_member_remove(member):
                 send_goodbye_thumbnail    = getjson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
                 server_name               = getjson(serverid, server_name, "server_name")
 
-                loaddatavar, dataindexdict = None, {}
+                loaddatavar, dataindexdict = None, None
 
         # gets the server object using the server name recieved from the welcome/goodbye channel command
         server = discord.utils.get(bot.guilds, name=server_name)
@@ -553,21 +646,7 @@ async def on_message(ctx, *args):
 
         global welcome_channel
 
-        global custom_welcome_message
-        global send_welcome_gif
-        global custom_welcome_gif
-        global send_welcome_message
-        global welcome_member_count_show
-        global send_welcome_emote
-        global custom_welcome_thumbnail
-        global send_welcome_thumbnail
-        global send_welcome_dm
-        global custom_welcome_dm
-
         global server_name
-        global autoroles
-
-        global first_welcome_set
 
         global loaddatavar
         global dataindexdict
@@ -576,44 +655,8 @@ async def on_message(ctx, *args):
         serverid = str(ctx.author.guild.id)
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
-
-        if getjson(serverid, first_welcome_set, "first_welcome_set") == False:
-                first_welcome_set = False
-
-
-        if first_welcome_set:
-
-                first_welcome_set = False
-
-                disposable = getjson(serverid, first_welcome_set, "first_welcome_set")
-
-                savejson(serverid, custom_welcome_message, "custom_welcome_message")
-                savejson(serverid, send_welcome_gif, "send_welcome_gif")
-                savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
-                savejson(serverid, send_welcome_message, "send_welcome_message")
-                savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
-                savejson(serverid, send_welcome_emote, "send_welcome_emote")
-                savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
-                savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
-                savejson(serverid, send_welcome_dm, "send_welcome_dm")
-                savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
-                savejson(serverid, autoroles, "autoroles")
-
-                savejson(serverid, False, "first_welcome_set")
-
-                loaddatavar, dataindexdict = None, {}
-
-
-
-        print(server_name)
-
-        #welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
-        print(welcome_channel)
-
-
         welcome_channel = getjson(serverid, welcome_channel, "welcome_channel")
         welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
-        print(welcome_channel)
 
         server_name = getjson(serverid, server_name, "server_name")
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
@@ -651,7 +694,7 @@ async def on_message(ctx, *args):
         savejson(serverid, welcome_channel, "welcome_channel")
         savejson(serverid, server_name, "server_name")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -693,7 +736,7 @@ async def on_message(ctx, *args):
         savejson(serverid, custom_welcome_message, "custom_welcome_message")
         savejson(serverid, send_welcome_message, "send_welcome_message")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -717,7 +760,7 @@ async def on_message(ctx):
         await ctx.send(f"Icy will send the default message as the welcome message")# confirms the command in the chat
 
         savejson(serverid, send_welcome_message, "send_welcome_message")
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -766,7 +809,7 @@ async def on_message(ctx, *args):
         savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
         savejson(serverid, send_welcome_gif, "send_welcome_gif")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -804,7 +847,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -842,7 +885,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, send_welcome_emote, "send_welcome_emote")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -883,7 +926,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -921,7 +964,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -931,50 +974,13 @@ async def on_message(ctx, *args):
 async def on_message(ctx, *args):
 
         global goodbye_channel
-
-        global custom_goodbye_message
-        global send_goodbye_gif
-        global custom_goodbye_gif
-        global send_goodbye_message
-        global goodbye_member_count_show
-        global send_goodbye_emote
-        global custom_goodbye_thumbnail
-        global send_goodbye_thumbnail
-
         global server_name
-
-        global first_goodbye_set
 
         global loaddatavar
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
-
-
-        if getjson(serverid, first_goodbye_set, "first_goodbye_set") == False:
-                first_goodbye_set = False
-
-
-        if first_goodbye_set:
-
-                first_goodbye_set = False
-
-                disposable = getjson(serverid, first_goodbye_set, "first_goodbye_set")
-
-                savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
-                savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
-                savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
-                savejson(serverid, send_goodbye_message, "send_goodbye_message")
-                savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
-                savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
-                savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
-                savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
-
-                savejson(serverid, False, "first_goodbye_set")
-
-                loaddatavar, dataindexdict = None, {}
-
 
 
         goodbye_channel = getjson(serverid, goodbye_channel, "goodbye_channel")
@@ -1010,7 +1016,7 @@ async def on_message(ctx, *args):
         savejson(serverid, goodbye_channel, "goodbye_channel")
         savejson(serverid, server_name, "server_name")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1049,7 +1055,7 @@ async def on_message(ctx, *args):
         savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
         savejson(serverid, send_goodbye_message, "send_goodbye_message")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1074,7 +1080,7 @@ async def on_message(ctx):
 
         savejson(serverid, send_goodbye_message, "send_goodbye_message")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1113,7 +1119,7 @@ async def on_message(ctx, *args):
         savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
         savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1151,7 +1157,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1189,7 +1195,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1231,7 +1237,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1269,7 +1275,7 @@ async def on_message(ctx, *args):
 
         savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1285,7 +1291,7 @@ async def on_message(ctx, *args):
         serverid = str(ctx.author.guild.id)
 
         send_welcome_dm = getjson(serverid, send_welcome_dm, "send_welcome_dm")
-        send_goodbye_gif = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
+        custom_welcome_dm = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
 
         if "None" in args[0] or "none" in args[0]:
                 send_welcome_dm = False
@@ -1306,7 +1312,7 @@ async def on_message(ctx, *args):
         savejson(serverid, send_welcome_dm, "send_welcome_dm")
         savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
 
-        loaddatavar, dataindexdict = None, {}
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1352,7 +1358,7 @@ async def on_message(ctx):
                         custom_welcome_dm         = getjson(serverid, custom_welcome_dm, "custom_welcome_dm")
                         autoroles                 = getjson(serverid, autoroles, "autoroles")
 
-                        loaddatavar, dataindexdict = None, {}
+                        loaddatavar, dataindexdict = None, None
 
 
 
@@ -1506,7 +1512,7 @@ async def on_message(ctx):
                 custom_goodbye_thumbnail  = getjson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
                 send_goodbye_thumbnail    = getjson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
 
-                loaddatavar, dataindexdict = None, {}
+                loaddatavar, dataindexdict = None, None
 
 
 
@@ -1608,12 +1614,17 @@ async def on_message(ctx):
 
 
 
-
-
 @bot.command(name="autorole")
 async def on_message(ctx, *args):
 
         global autoroles
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        autoroles = getjson(serverid, autoroles, "autoroles")
 
         autoroles_raw = list(args)# the list containing mentioned roles
         roles = extract_string(args)# gets the roles as string
@@ -1628,6 +1639,9 @@ async def on_message(ctx, *args):
         # confirmation in the chat
         await ctx.send(f"icy will add {roles}, when a new memer joins")
 
+        savejson(serverid, autoroles, "autoroles")
+        loaddatavar, dataindexdict = None, None
+
 
 
 
@@ -1641,6 +1655,13 @@ async def on_message(ctx, *args):
         global suggestion_num# gets the global varriable to have the latest number of suggestion in
         global suggestions# the global dictionary to store suggestion info respect to their number
 
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        suggestion_num = getjson(serverid, suggestion_num, "suggestion_num")
+        suggestions = getjson(serverid, suggestions, "suggestions")
 
         welp = args
         sug = ""
@@ -1683,6 +1704,11 @@ async def on_message(ctx, *args):
         await message.add_reaction("⬆️")# adds the reaction to the message
         await message.add_reaction("⬇️")# adds the reaction to the message
 
+        savejson(serverid, suggestion_num, "suggestion_num")
+        savejson(serverid, suggestions, "suggestions")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 #suggestion accepted
@@ -1690,6 +1716,13 @@ async def on_message(ctx, *args):
 async def on_message(ctx, *args):
 
         global suggestions# imports the global dictionary containing the suggestions
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        suggestions = getjson(serverid, suggestions, "suggestions")
 
         welp = list(args)
 
@@ -1705,7 +1738,7 @@ async def on_message(ctx, *args):
 
         try:
 
-                suggestion_number = int(suggestion_number)# converts the suggestion number to int datatype
+                suggestion_number = str(suggestion_number)# converts the suggestion number to int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
                 suggestion_content = suggestions.get(suggestion_number).get("suggestion")# gets the main suggestion from the nested dictionart
@@ -1728,6 +1761,10 @@ async def on_message(ctx, *args):
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
+        savejson(serverid, suggestions, "suggestions")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 #suggestion denied
@@ -1735,6 +1772,13 @@ async def on_message(ctx, *args):
 async def on_message(ctx, *args):
 
         global suggestions# imports the global dictionary containing the suggestions
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        suggestions = getjson(serverid, suggestions, "suggestions")
 
         welp = list(args)
 
@@ -1750,7 +1794,7 @@ async def on_message(ctx, *args):
 
         try:
 
-                suggestion_number = int(suggestion_number)# converts the suggestion number to an int datatype
+                suggestion_number = str(suggestion_number)# converts the suggestion number to an int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
                 suggestion_content = suggestions.get(suggestion_number).get("suggestion")# gets the suggestion from the nested dictionary
@@ -1773,6 +1817,10 @@ async def on_message(ctx, *args):
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
+        savejson(serverid, suggestions, "suggestions")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 #suggestion considering
@@ -1780,6 +1828,13 @@ async def on_message(ctx, *args):
 async def on_message(ctx, *args):
 
         global suggestions# imports the global dictionary containing the suggestions
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        suggestions = getjson(serverid, suggestions, "suggestions")
 
         welp = list(args)
 
@@ -1794,7 +1849,7 @@ async def on_message(ctx, *args):
 
         try:
 
-                suggestion_number = int(suggestion_number)# converts suggestion number to an int datatype
+                suggestion_number = str(suggestion_number)# converts suggestion number to an int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
                 suggestion_content = suggestions.get(suggestion_number).get("suggestion")# gets the suggestion from the nested dictionary
@@ -1817,6 +1872,10 @@ async def on_message(ctx, *args):
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
+        savejson(serverid, suggestions, "suggestions")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 
@@ -1829,16 +1888,24 @@ async def on_message(ctx, *args):
 
         global muterole# umports the global varriable so it can again be used in the mute function
 
-        welp = args
+        global muted_user_roles
 
-        mute_role = welp[0]# sets the muterole as mentioned by user in the message
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        muterole = getjson(serverid, muterole, "muterole")
+
+        mentioned_role = args
+
+        muterole = extract_user_and_role(mentioned_role[0])# sets the muterole as mentioned by user in the message
 
 
         try :
-                role = await commands.RoleConverter().convert(ctx, mute_role)# converts muterole to a role object
+                role = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
                 permissions = discord.Permissions()# sets permissions as a Permissions object from discord lib
 
-                muterole = role# sets global varriable as the role object
 
                 # contains all the values for the permissions for the role and updates them in the permissions object
                 permissions.update(
@@ -1877,7 +1944,7 @@ async def on_message(ctx, *args):
 
                 await role.edit(reason=None, color=0xd7090b, permissions=permissions)# changes the roles perms according to perms mentioned in the permissions tuple
 
-                description = f"{mute_role} has been set up as the mute role"# description for the embed
+                description = f"{mentioned_role} has been set up as the mute role"# description for the embed
                 embeded = discord.Embed(title="Mute Role Setted Up", description=description, color=0x2ca26f)# creates the embed
 
         except:
@@ -1888,6 +1955,11 @@ async def on_message(ctx, *args):
 
         await ctx.send(embed=embeded)# sends the embed in the chat
 
+        savejson(serverid, muterole, "muterole")
+        savejson(serverid, muted_user_roles, "muted_user_roles")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 #mute
@@ -1896,8 +1968,23 @@ async def on_message(ctx, *args):
 
         global muterole# gets the global varriable consisting the mute role
 
-        welp = args
-        userid = extract_user_and_role(welp[0])# gets the userid from the mentioned user string format
+        global muted_user_roles
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        muterole = getjson(serverid, muterole, "muterole")
+        savejson(serverid, {}, "muted_user_roles")
+
+        muted_user_roles = getjson(serverid, muted_user_roles, "muted_user_roles")
+
+
+        muterole_obj = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
+
+        mentioned_user = args
+        userid = extract_user_and_role(mentioned_user[0])# gets the userid from the mentioned user string format
 
 
         time_of_message = ctx.message.created_at# gets the time at which the message was sent by author
@@ -1960,7 +2047,20 @@ async def on_message(ctx, *args):
         try:
 
                 member = await commands.MemberConverter().convert(ctx, userid)# converts userid into a member object
-                await member.add_roles(muterole)# adds the muterole to the member
+
+                muted_user_role_ids = []
+
+                mentioned_roles_list = member.roles
+                mentioned_roles_list.pop(0)
+
+
+                for i in mentioned_roles_list:
+
+                        await member.remove_roles(i)
+                        muted_user_role_ids.append(i.id)
+
+
+                await member.add_roles(muterole_obj)# adds the muterole to the member
 
                 # if no time is mentioned
                 if time_unmute == time_of_message:
@@ -1968,11 +2068,15 @@ async def on_message(ctx, *args):
                         title = f"{member.name} muted"
                         desc = f"{member.name} has been muted indefinitely"
 
+                        muted_user_roles.update({member.id: muted_user_role_ids})# will only happen when muted indefinitely
+
 
                         embeded = discord.Embed(title=title, description=desc, color=0xd60e11)# creates the ember
 
                         if reason:
                                 embeded.add_field(name="Reason", value=reason, inline=False)# adds the reason field to the embed if reason is given
+
+                        await ctx.send(embed=embeded)# sends the embed in the chat
 
                 else :
 
@@ -1985,22 +2089,19 @@ async def on_message(ctx, *args):
                         if reason:
                                 embeded.add_field(name="Reason", value=reason, inline=False)# adds the reason field to the embed if reason is given
 
-                        # unless time to unmute is equal to the time of the message
-                        while True:
-                                now = datetime.datetime.now().astimezone(pytz.timezone('UTC'))# takes the current time in utc timezone
+                        await ctx.send(embed=embeded)# sends the embed in the chat
 
-                                # when time to unmute is equal to the time at the moment
-                                if now.hour == time_unmute.hour and now.minute == time_unmute.minute and now.second == time_unmute.second and now.day == time_unmute.day:
+                        print(f"command: \"mute\" sent by:{ctx.author} time:{ctx.message.created_at}")
 
-                                        try :
-                                                await member.remove_roles(muterole)# removes the muterole from the user
-                                                await ctx.send(f"{member} is unmuted")# confirms the unmute in the chat
-                                        except :
-                                                pass
-                                        break
+                        time.sleep(timedelta.total_seconds())
+
+                        for i in mentioned_roles_list:
+                        
+                                await member.add_roles(i)
 
 
-                print(f"command: \"mute\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                        await member.remove_roles(muterole_obj)# removes the muterole from the user
+                        await ctx.send(f"{member.name} is unmuted")# confirms the unmute in the chat
 
 
         except:
@@ -2011,6 +2112,10 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)# sends the embed in the chat
 
+        savejson(serverid, muted_user_roles, "muted_user_roles")
+
+        loaddatavar, dataindexdict = None, None
+
 
 
 #unmute
@@ -2019,21 +2124,46 @@ async def on_message(ctx, *args):
 
         global muterole# gets the global mute role
 
+        global muted_user_roles
+
+        global loaddatavar
+        global dataindexdict
+
+        serverid = str(ctx.author.guild.id)
+
+        muted_user_roles = getjson(serverid, muted_user_roles, "muted_user_roles")
+        muterole = getjson(serverid, muterole, "muterole")
 
         user_id = extract_user_and_role(args[0])# gets the user id
+
+        muterole_obj = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
 
         try:
                 # converts the id into the member object
                 member = await commands.MemberConverter().convert(ctx, user_id)
 
+                mentioned_roles_id_list = muted_user_roles.get(str(member.id))
+
+                muted_user_roles.pop(str(member.id))
+
                 # removes the mute role from user
-                await member.remove_roles(muterole)
+                await member.remove_roles(muterole_obj)
+
+                for i in mentioned_roles_id_list:
+
+                        role = await commands.RoleConverter().convert(ctx, str(i))
+                        await member.add_roles(role)
+
                 await ctx.send(f"{member.name} has been unmuted")
 
         except:
                 # if the mentioned user is invalid
-                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exists", color=0x090202)
+                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exists or isn't muted", color=0x090202)
                 await ctx.send(embed=embeded)
+
+        savejson(serverid, muted_user_roles, "muted_user_roles")
+
+        loaddatavar, dataindexdict = None, None
 
 
 
@@ -2103,7 +2233,7 @@ async def on_message(ctx, *args):
 
                 response_gif = random.choice(greet_gifs)# gets a random gif from the list
 
-                if {mentioned.nick} and {ctx.author.nick}:
+                if mentioned.nick and ctx.author.nick:
 
                         greets_other = [
                                 f'heyyyy {mentioned.nick}',
@@ -2113,7 +2243,7 @@ async def on_message(ctx, *args):
 
                         title = f"{ctx.author.nick} says hi to you {mentioned.nick}"
                         response = random.choice(greets_other)# randomly chooses a response from the greet_others list
-                elif {mentioned.nick} and not {ctx.author.nick}:
+                elif mentioned.nick and not ctx.author.nick:
 
                         greets_other = [
                                 f'heyyyy {mentioned.nick}',
@@ -2123,7 +2253,7 @@ async def on_message(ctx, *args):
 
                         title = f"{ctx.author.name} says hi to you {mentioned.nick}"
                         response = random.choice(greets_other)# randomly chooses a response from the greet_others list
-                elif {ctx.author.nick} and not {mentioned.nick}:
+                elif ctx.author.nick and not mentioned.nick:
 
                         greets_other = [
                                 f'heyyyy {mentioned.name}',
@@ -2157,28 +2287,51 @@ async def on_message(ctx, *args):
         if not welp:# when another user isn't mentioned
 
                 greets_self = [
-                        f'heyyyy <@!{ctx.author.id}>',
-                        'sup bitch',
-                        'heyo',
-                        '*fuck am too nervous*',
-                        'OwO',
-                        'uwu',
-                        'shakie shakie',
-                        'welpwelpwelp',
-                        'lol',
-                        'you know, you\'re a waste of hair',
-                        'dont talk to me peasant',
-                        'st-step bro/sis/sibling-',
-                        'dont talk to me peasant',
-                        'umm',
-                        'flIpPiN moThEr DipIn',
-                        'bonk',
-                        'flippity dippity you fuckity lickity dickity shitity',
-                        'what?',
-                        f'hello. <@!{ctx.author.id}>.',
-                        'no.',
-                        'ew',
-                        'schwepite innt mate',
+                        f"heyyyy <@!{ctx.author.id}>",
+                        "sup bitch",
+                        "heyo",
+                        "*fuck am too nervous*",
+                        "OwO",
+                        "uwu",
+                        "shakie shakie",
+                        "welpwelpwelp",
+                        "lol",
+                        "you know, you\'re a waste of hair",
+                        "dont talk to me peasant",
+                        "st-step bro/sis/sibling-",
+                        "dont talk to me peasant",
+                        "umm",
+                        "flIpPiN moThEr DipIn",
+                        "bonk",
+                        "flippity dippity you fuckity lickity dickity shitity",
+                        "what?",
+                        f"hello. <@!{ctx.author.id}>.",
+                        "no.",
+                        "ew",
+                        "schwepite innt mate",
+                        "SHAKIESHAKIE WAKIEWAKIE MF",
+                        "how you doin 😳",
+                        "shut",
+                        "no.",
+                        "NO.",
+                        "NOOOOO.",
+                        "ew",
+                        "can you just... go away-",
+                        "bye",
+                        "hate it here",
+                        "sup you beautiful son of a beautiful cat 😳",
+                        "damnnnnnn",
+                        "uhuhuhuhuhuhhh 😳",
+                        "hey seggsy 😳",
+                        "bye seggsy 😔",
+                        "no seggsy 😩",
+                        "ew seggsy 😩",
+                        "hey 😳",
+                        "Owo",
+                        "😳",
+                        "😏",
+                        "😔",
+                        "😩",
                 ]
 
                 greet_gifs = [
@@ -2226,7 +2379,7 @@ async def on_message(ctx, *args):
                 response_gifs = random.choice(greet_gifs)# gets a random gif from the list
                 response = random.choice(greets_self)# randomly chooses a response from the greet_self list
 
-                if {ctx.author.nick}:
+                if ctx.author.nick:
                         title = f"Heyyyy {ctx.author.nick}"
                 else :
                         title = f"Heyyyy {ctx.author.name}"
@@ -2299,13 +2452,13 @@ async def on_message(ctx, *args):
 
                 response_gif = random.choice(dance_gifs)# gets a random gif from the list
 
-                if {mentioned.nick} and {ctx.author.nick}:
+                if mentioned.nick and ctx.author.nick:
                         title = f"{ctx.author.nick} wanna dance with you {mentioned.nick}"
                         response = f"dance {mentioned.nick}, dance with me baby"
-                elif {mentioned.nick} and not {ctx.author.nick}:
+                elif mentioned.nick and not ctx.author.nick:
                         title = f"{ctx.author.name} wanna dance with you {mentioned.nick}"
                         response = f"dance {mentioned.nick}, dance with me baby"
-                elif {ctx.author.nick} and not {mentioned.nick}:
+                elif ctx.author.nick and not mentioned.nick:
                         title = f"{ctx.author.nick} wanna dance with you {mentioned.name}"
                         response = f"dance {mentioned.name}, dance with me baby"
                 else :
@@ -2369,7 +2522,7 @@ async def on_message(ctx, *args):
 
                 response_gif = random.choice(dance_gifs)# gets a random gif from the list
 
-                if {ctx.author.nick}:
+                if ctx.author.nick:
                         title = f"{ctx.author.nick} is dancing"
                         response = f"dance baby dance with me baby"
                 else :
@@ -2448,13 +2601,13 @@ async def on_message(ctx, *args):
 
                 response_gif = random.choice(kiss_gifs)# gets a random gif from the list
 
-                if {mentioned.nick} and {ctx.author.nick}:
+                if mentioned.nick and ctx.author.nick:
                         title = f"{ctx.author.nick} is giving you a kiss {mentioned.nick}"
                         response = f"kiss has shared a kiss with {mentioned.nick}"
-                elif {mentioned.nick} and not {ctx.author.nick}:
+                elif mentioned.nick and not ctx.author.nick:
                         title = f"{ctx.author.name} is giving you a kiss {mentioned.nick}"
                         response = f"kiss has shared a kiss with {mentioned.nick}"
-                elif {ctx.author.nick} and not {mentioned.nick}:
+                elif ctx.author.nick and not mentioned.nick:
                         title = f"{ctx.author.nick} is giving you a kiss {mentioned.name}"
                         response = f"kiss has shared a kiss with {mentioned.name}"
                 else :
@@ -2521,7 +2674,7 @@ async def on_message(ctx, *args):
 
                 response_gif = random.choice(kiss_gifs)# gets a random gif from the list
 
-                if {ctx.author.nick}:
+                if ctx.author.nick:
                         title = f"{ctx.author.nick} is kissing random people"
                         response = f"{ctx.author.nick} wanna kiss someone"
                 else :
@@ -2557,13 +2710,13 @@ async def on_message(ctx, *args):
                 mentioned = await commands.MemberConverter().convert(ctx, userid)# converts the user id to a member object
 
 
-                avatar = f"https://cdn.discordapp.com/avatars/{mentioned.id}/{mentioned.avatar}.png"# url for the mentioned users avatar
+                avatar = mentioned.avatar_url_as(size=256)# url for the mentioned users avatar
 
-                if {mentioned.nick} and {ctx.author.nick}:
+                if mentioned.nick and ctx.author.nick:
                         title = f"here is {mentioned.nick}'s beautiful face for you {ctx.author.nick}"
-                elif {mentioned.nick} and not {ctx.author.nick}:
+                elif mentioned.nick and not ctx.author.nick:
                         title = f"here is {mentioned.nick}'s beautiful face for you {ctx.author.name}"
-                elif {ctx.author.nick} and not {mentioned.nick}:
+                elif ctx.author.nick and not mentioned.nick:
                         title = f"here is {mentioned.name}'s beautiful face for you {ctx.author.nick}"
                 else :
                         title = f"here is {mentioned.name}'s beautiful face for you {ctx.author.name}"
@@ -2577,32 +2730,31 @@ async def on_message(ctx, *args):
 
                 await ctx.send(embed=embeded)# sends the embed in the discord chat
 
+
+
         except:
 
-                try:
-                       if welp:
-                               embeded = discord.Embed(title="ERROR", description="User doesn't exists", color=0x090202)
+                if welp:
 
-                               await ctx.send(embed=embeded)
-
+                        embeded = discord.Embed(title="ERROR", description="User doesn't exists", color=0x090202)
+                        await ctx.send(embed=embeded)
 
 
-                except:
-                        avatar = f"https://cdn.discordapp.com/avatars/{ctx.author.id}/{ctx.author.avatar}.png"# url for the users avatar
+                avatar = ctx.author.avatar_url_as(size=256)# url for the users avatar
 
-                        if {ctx.author.nick}:
-                                title = f"here's your beautiful face {ctx.author.nick}"
-                        else :
-                                title = f"here's your beautiful face {ctx.author.name}"
-
-
-                        embeded = discord.Embed(title=title, color=0x5643ba)# creates a discord embed with the title and the color
-                        embeded.set_image(url=avatar)# sets the user avatar in the embed
+                if ctx.author.nick:
+                        title = f"here's your beautiful face {ctx.author.nick}"
+                else :
+                        title = f"here's your beautiful face {ctx.author.name}"
 
 
-                        print(f"command: \"av\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+                embeded = discord.Embed(title=title, color=0x5643ba)# creates a discord embed with the title and the color
+                embeded.set_image(url=avatar)# sets the user avatar in the embed
 
-                        await ctx.send(embed=embeded)# sends the embed in the discord chat
+
+                print(f"command: \"av\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+
+                await ctx.send(embed=embeded)# sends the embed in the discord chat
 
 
 
@@ -2787,17 +2939,11 @@ async def on_message(ctx, *args):
 
         await ctx.send(f"icy thy remind you {ctx.author.name}, in {timedelta}{reminder_message_true}")# the message confirming the reminder
 
+        time.sleep(timedelta.total_seconds())
 
-        # runs unless the time of message is equal to the reminding time to remove the 0 endcase
-        while time_of_message.hour != time_reminder.hour or time_of_message.minute != time_reminder.minute or time_of_message.second != time_reminder.second or time_of_message.day != time_reminder.day:
-                now = datetime.datetime.now().astimezone(pytz.timezone('UTC'))# takes the current time while running the loop in UTC timezone
 
-                #if the time now would be equal to the reminding time the code will execute and stop the loop
-                if now.hour == time_reminder.hour and now.minute == time_reminder.minute and now.second == time_reminder.second and now.day == time_reminder.day:
-                        await ctx.author.create_dm()# creates an personal dm channel with the author
-                        await ctx.author.dm_channel.send(f"IT'S TIMEEEEEEE <@!{ctx.author.id}>{reminder_message_dm}")# sends the reminder message as a dm
-
-                        break
+        await ctx.author.create_dm()# creates an personal dm channel with the author
+        await ctx.author.dm_channel.send(f"IT'S TIMEEEEEEE <@!{ctx.author.id}>{reminder_message_dm}")# sends the reminder message as a dm
 
 
 
@@ -2854,6 +3000,19 @@ async def on_message(ctx):
         global loaddatavar
         global dataindexdict
 
+        listroles = ctx.author.roles
+        print(ctx.author.roles[1])
+        print(type(ctx.author.roles[1]))
+        listroles.pop(0)
+
+        for i in listroles:
+
+                await ctx.author.remove_roles(i)
+        
+        await ctx.send(ctx.author.roles)
+        await ctx.send(type(ctx.author.roles[0]))
+        #await ctx.send(listroles.remove(0))
+
         #with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\testbotdata.json", "r") as jsonfile:
         #        loaddata = json.load(jsonfile)
         #
@@ -2908,16 +3067,16 @@ async def on_message(ctx):
         #        #pass
 
 
-        serverid = str(ctx.author.guild.id)
-        testvar2 = None#"welpwelpwelpwelp"
-        testvar = getjson(serverid, testvar, "testvar")
-        testvar2 = getjson(serverid, testvar2, "testvar2")
-
-        await ctx.send(testvar)
-
-        savejson(serverid, "sexy", "testvar")
-        savejson(serverid, None, "testvar2")
-        loaddatavar, dataindexdict = None, {}
+        #serverid = str(ctx.author.guild.id)
+        #testvar2 = None#"welpwelpwelpwelp"
+        #testvar = getjson(serverid, testvar, "testvar")
+        #testvar2 = getjson(serverid, testvar2, "testvar2")
+        #
+        #await ctx.send(testvar)
+        #
+        #savejson(serverid, "sexy", "testvar")
+        #savejson(serverid, None, "testvar2")
+        #loaddatavar, dataindexdict = None, {}
 
 
 
