@@ -2,10 +2,7 @@
         "guilddata": [
                 {
                         "783340598706569226": {
-                                "testvar": "sexy",
-                                "testvar2": null,
                                 "welcome_channel": "785174324264828958",
-                                "server_name": "icyarse's",
                                 "custom_welcome_message": null,
                                 "send_welcome_gif": true,
                                 "custom_welcome_gif": null,
@@ -17,7 +14,7 @@
                                 "send_welcome_dm": false,
                                 "custom_welcome_dm": null,
                                 "autoroles": [],
-                                "first_welcome_set": false,
+                                "goodbye_channel": "785174355507544074",
                                 "custom_goodbye_message": null,
                                 "send_goodbye_gif": true,
                                 "custom_goodbye_gif": null,
@@ -26,8 +23,22 @@
                                 "send_goodbye_emote": true,
                                 "custom_goodbye_thumbnail": null,
                                 "send_goodbye_thumbnail": true,
-                                "first_goodbye_set": false,
-                                "goodbye_channel": "785174355507544074"
+                                "muterole": "797850674057445426",
+                                "suggestion_num": 2,
+                                "suggestions": {
+                                        "1": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "test "
+                                        },
+                                        "2": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "test 2 "
+                                        }
+                                },
+                                "thoughtlimit": 1,
+                                "memelimit": 1,
+                                "catlimit": 1,
+                                "muted_user_roles": {}
                         }
                 }
         ]
