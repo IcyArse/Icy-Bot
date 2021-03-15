@@ -24,7 +24,7 @@
                                 "custom_goodbye_thumbnail": null,
                                 "send_goodbye_thumbnail": true,
                                 "muterole": "797850674057445426",
-                                "suggestion_num": 2,
+                                "suggestion_num": 3,
                                 "suggestions": {
                                         "1": {
                                                 "name": "icyarse#7780",
@@ -33,11 +33,15 @@
                                         "2": {
                                                 "name": "icyarse#7780",
                                                 "suggestion": "test 2 "
+                                        },
+                                        "3": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "pls "
                                         }
                                 },
-                                "thoughtlimit": 1,
-                                "memelimit": 1,
-                                "catlimit": 1,
+                                "thoughtlimit": 2,
+                                "memelimit": 2,
+                                "catlimit": 2,
                                 "muted_user_roles": {}
                         }
                 }

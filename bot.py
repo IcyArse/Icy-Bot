@@ -12,6 +12,7 @@ from prawcore import auth
 import pytz
 import time
 import datetime
+import sched
 
 
 from dotenv import load_dotenv
@@ -80,9 +81,9 @@ if True:
         muterole = None
 
         # post starting limits (later will be reset using a clock)
-        thoughtlimit = 1
-        memelimit = 1
-        catlimit = 1
+        thoughtlimit = 2
+        memelimit = 2
+        catlimit = 2
 
         testvar = None
         testvar2 = None
@@ -93,6 +94,7 @@ if True:
 
         dataindexdict = None
         loaddatavar = None
+
 
 
 
@@ -158,10 +160,11 @@ def getjson(serverid, variable, variable_string):
                                 except:
 
                                         print("THE VARIABLE ISN'T PRESENT 0")
-                                        var = {variable_string: variable}
+                                        savejson(serverid, variable, variable_string)
+                                        #var = {variable_string: variable}
 
-                                        i.get(serverid).update(var)
-                                        variable = i[serverid].get(variable_string)
+                                        #i.get(serverid).update(var)
+                                        #variable = i[serverid].get(variable_string)
 
                                         print("THE VARIABLE ISN'T PRESENT")
                                         break
@@ -173,7 +176,7 @@ def getjson(serverid, variable, variable_string):
                         loaddata["guilddata"].append({serverid: {}})
 
                         dataindex = -1
-                        dataindexdict.update({variable_string: dataindex})
+                        dataindexdict = -1
 
                         loaddata["guilddata"][-1][serverid].update({variable_string: variable})
                         variable = loaddata["guilddata"][-1][serverid].get(variable_string)
@@ -201,8 +204,29 @@ def savejson(serverid, newvalue, variable_string):
 
         print("IT SAVED BABY")
 
+def reddit_hot_reset():
+
+        global thoughtlimit
+        global memelimit
+        global catlimit
+
+        thoughtlimit = 2
+        memelimit = 2
+        catlimit = 2
 
 
+        now = datetime.datetime.now().astimezone(pytz.timezone("UTC"))
+        nextday = datetime.datetime.now().astimezone(pytz.timezone("UTC")) + datetime.timedelta(days=1)
+        utcmidnight = datetime.datetime(hour=5, minute=30, second=0, day=nextday.day, month=nextday.month, year=nextday.year).astimezone(pytz.timezone("UTC"))
+        
+        sleep_time = utcmidnight - now
+        sleep_time = sleep_time.total_seconds()
+        
+        sched.threading.Timer(sleep_time, reddit_hot_reset).start()
+        print("resetted reddit hot limits")
+
+
+reddit_hot_reset()
 
 
 
@@ -211,9 +235,14 @@ def savejson(serverid, newvalue, variable_string):
 async def on_ready():
 
         print(f'{bot.user.name} has connected to Discord!')# takes the name of the bot and then prints the given string
+
         guild = discord.utils.get(bot.guilds, name=GUILD)# gets the guild name using the .env file and the get function from discord.utils
         memberss = [member.name for member in guild.members]# creates a list of members
         print(f'server members are: {memberss}')# prints the members
+
+        now = datetime.datetime.now().astimezone(pytz.timezone("UTC"))
+        print(f"connected at: {now} UTC")
+
 
 
 
