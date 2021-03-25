@@ -1,0 +1,49 @@
+{
+        "guilddata": [
+                {
+                        "783340598706569226": {
+                                "welcome_channel": "785174324264828958",
+                                "custom_welcome_message": null,
+                                "send_welcome_gif": true,
+                                "custom_welcome_gif": null,
+                                "send_welcome_message": true,
+                                "welcome_member_count_show": true,
+                                "send_welcome_emote": true,
+                                "custom_welcome_thumbnail": null,
+                                "send_welcome_thumbnail": true,
+                                "send_welcome_dm": false,
+                                "custom_welcome_dm": null,
+                                "autoroles": [],
+                                "goodbye_channel": "785174355507544074",
+                                "custom_goodbye_message": null,
+                                "send_goodbye_gif": true,
+                                "custom_goodbye_gif": null,
+                                "send_goodbye_message": true,
+                                "goodbye_member_count_show": true,
+                                "send_goodbye_emote": true,
+                                "custom_goodbye_thumbnail": null,
+                                "send_goodbye_thumbnail": true,
+                                "muterole": "797850674057445426",
+                                "suggestion_num": 3,
+                                "suggestions": {
+                                        "1": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "test "
+                                        },
+                                        "2": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "test 2 "
+                                        },
+                                        "3": {
+                                                "name": "icyarse#7780",
+                                                "suggestion": "pls "
+                                        }
+                                },
+                                "thoughtlimit": 2,
+                                "memelimit": 2,
+                                "catlimit": 2,
+                                "muted_user_roles": {}
+                        }
+                }
+        ]
+}
