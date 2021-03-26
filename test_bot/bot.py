@@ -14,6 +14,7 @@ import time
 import datetime
 import sched
 
+from textwrap import dedent
 
 from dotenv import load_dotenv
 
@@ -125,7 +126,7 @@ def getjson(serverid, variable, variable_string):
 
         server_in_file = False
 
-        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdatatest.json", "r") as jsonfile:
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\Icy-Bot\\botdatatest.json", "r") as jsonfile:
 
                 loaddata = json.load(jsonfile)
 
@@ -170,7 +171,7 @@ def getjson(serverid, variable, variable_string):
                 
                 print("THE SERVER ISN'T PRESENT IN THE LIST 0")
 
-                with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdatatest.json", "w") as dumpfile:
+                with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\Icy-Bot\\botdatatest.json", "w") as dumpfile:
                         loaddata["guilddata"].append({serverid: {}})
                         json.dump(loaddata, dumpfile, indent=8)
 
@@ -189,7 +190,7 @@ def savejson(serverid, newvalue, variable_string):
 
         dataindex = dataindexdict
 
-        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdatatest.json", "r") as jsonfile:
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\Icy-Bot\\botdatatest.json", "r") as jsonfile:
 
                 loaddata = json.load(jsonfile)
 
@@ -198,7 +199,7 @@ def savejson(serverid, newvalue, variable_string):
 
 
         #DUMPS
-        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdatatest.json", "w") as dumpfile:
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\Icy-Bot\\botdatatest.json", "w") as dumpfile:
                 json.dump(loaddata, dumpfile, indent=8)
 
         print("IT SAVED BABY")
@@ -356,7 +357,7 @@ async def on_guild_join(guild):
 
         serverid = str(guild.id)
 
-        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\botdata.json", "r") as jsonfile:
+        with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\Icy-Bot\\botdatatest.json", "r") as jsonfile:
                 loaddata = json.load(jsonfile)
                 loaddata["guilddata"].append({serverid: {}})
 
@@ -3013,20 +3014,43 @@ async def on_message(ctx):
 @bot.command(name="welp", help="testing command")
 async def on_message(ctx):
 
-        global testvar
-        global dataindexdict
+        print("JOINED")
 
-        listroles = ctx.author.roles
-        print(ctx.author.roles[1])
-        print(type(ctx.author.roles[1]))
-        listroles.pop(0)
+        image_link = "https://media.discordapp.net/attachments/814539604472496168/823988886082420796/20210323_203731.gif"
+        title = "welcome to __hanako__ <3"
+        content = dedent(f"""
+        <@!{ctx.author.id}>
 
-        for i in listroles:
+        ,, <#807544089016401931>
+        ,, <#824269867166203955>
+        ,, <#807559580863299604>
 
-                await ctx.author.remove_roles(i)
-        
-        await ctx.send(ctx.author.roles)
-        await ctx.send(type(ctx.author.roles[0]))
+        """)
+
+        welcome_embed = discord.Embed(title=title, description=content, colour=0x2f3136)
+        welcome_embed.set_thumbnail(url=image_link)
+
+        channel = await commands.TextChannelConverter().convert(ctx, str(783340598706569229))
+        #print(f"{member.name} has joined Welcome! 😊 ")
+        #channel = discord.utils.get(member.guild.text_channels, name="welcome and goodbyes")
+        #await channel.send(f"{member.mention} has joined! 😊")
+
+        await channel.send(embed=welcome_embed)
+
+        #global testvar
+        #global dataindexdict
+#
+        #listroles = ctx.author.roles
+        #print(ctx.author.roles[1])
+        #print(type(ctx.author.roles[1]))
+        #listroles.pop(0)
+#
+        #for i in listroles:
+#
+        #        await ctx.author.remove_roles(i)
+        #
+        #await ctx.send(ctx.author.roles)
+        #await ctx.send(type(ctx.author.roles[0]))
         #await ctx.send(listroles.remove(0))
 
         #with open("C:\\pythonWay\\PROJECTS\\DISCORD_BOT\\testbotdata.json", "r") as jsonfile:
