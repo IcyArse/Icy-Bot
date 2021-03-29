@@ -690,7 +690,7 @@ async def on_member_remove(member):
 
 
 @bot.command(name="setwelcomechannel")
-async def on_message(ctx, *args):
+async def on_message(ctx, arg):
 
         global welcome_channel
         global server_name
@@ -703,12 +703,12 @@ async def on_message(ctx, *args):
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
         welcome_channel = getjson(serverid, welcome_channel, "welcome_channel")
-        welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
+        welcome_channel = extract_channel(arg)# gets the channel id from the arguments
 
         server_name = getjson(serverid, server_name, "server_name")
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
-        if "None" in args[0] or "none" in args[0]:
+        if "None" == arg or "none" == arg:
 
                 welcome_channel = None
                 print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
@@ -717,7 +717,7 @@ async def on_message(ctx, *args):
 
         else:
 
-                welcome_channel = extract_channel(args[0])# gets the channel id from the arguments
+                welcome_channel = extract_channel(arg[0])# gets the channel id from the arguments
 
 
                 try:
@@ -743,7 +743,7 @@ async def on_message(ctx, *args):
 
 
 @bot.command(name="setwelcomemessage")
-async def on_message(ctx, *args):
+async def on_message(ctx, arg):
 
         global custom_welcome_message
         global send_welcome_message
@@ -756,9 +756,9 @@ async def on_message(ctx, *args):
         custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
         send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
 
-        custom_welcome_message = extract_string(args)# gets the message given by user and sets it as the global varriable
+        custom_welcome_message = extract_string(arg)# gets the message given by user and sets it as the global varriable
 
-        if "None" in args[0] or "none" in args[0]:
+        if "None" == arg or "none" == arg or "False" == arg or "false" == arg:
 
                 custom_welcome_message = None
 
@@ -768,13 +768,19 @@ async def on_message(ctx, *args):
 
                 await ctx.send(f"Icy won't send the welcome message when a user joins the server")
 
-        else:
+        elif "True" == arg or "true" == arg:
                 
                 send_welcome_message = True
 
                 print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
                 await ctx.send(f"The following message is set as the welcome message: \"{custom_welcome_message}\"")# confirms the command in the chat
+
+        else:
+                heat_up_message = "please give a valid input(true/false/none)"
+
+                embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
+                await ctx.send(embed=embeded)
 
         savejson(serverid, custom_welcome_message, "custom_welcome_message")
         savejson(serverid, send_welcome_message, "send_welcome_message")
@@ -807,7 +813,7 @@ async def on_message(ctx):
 
 
 @bot.command(name="setwelcomegif")
-async def on_message(ctx, *args):
+async def on_message(ctx, arg):
 
         global custom_welcome_gif
         global send_welcome_gif
@@ -821,14 +827,14 @@ async def on_message(ctx, *args):
 
         print(f"command: \"setwelcomegif\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
-        if "None" in args or "none" in args:
+        if "None" == arg or "none" == arg:
 
                 send_welcome_gif = False
 
                 await ctx.send("Icy won't add a gif in the welcome message")
 
 
-        elif "True" in args or "True" in args:
+        elif "True" == arg or "True" == arg:
 
                 send_welcome_gif = True
 
@@ -837,15 +843,21 @@ async def on_message(ctx, *args):
 
         else:
                 
-                custom_welcome_gif = args
+                custom_welcome_gif = arg
                 send_welcome_gif = True
 
                 try:
-                        await ctx.send("The following gif will be used as welcoming gif:")
-                        await ctx.send(url=custom_welcome_gif)
+                        title = "The following gif will be used as welcoming gif:")
+
+                        embeded = discord.Embed(title=title, description="", color=0x5fb79d)
+                        embeded.set_image(url=custom_welcome_gif)
+                        await ctx.send(embed=embeded)
 
                 except:
-                        await ctx.send("Invalid link. Please make sure to give the link of the gif location")
+                        heat_up_message = "Invalid link. Please make sure to give the link of the gif location"
+
+                        embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
+                        await ctx.send(embed=embeded)
 
         savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
         savejson(serverid, send_welcome_gif, "send_welcome_gif")
