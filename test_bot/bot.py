@@ -714,10 +714,12 @@ async def on_message(ctx, arg):
                 print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
                 await ctx.send("Icy will not send any welcome messages")
+                savejson(serverid, welcome_channel, "welcome_channel")
 
         else:
 
                 welcome_channel = extract_channel(arg[0])# gets the channel id from the arguments
+                savejson(serverid, welcome_channel, "welcome_channel")
 
 
                 try:
@@ -735,7 +737,6 @@ async def on_message(ctx, arg):
                         await ctx.send(embed=embeded)
 
 
-        savejson(serverid, welcome_channel, "welcome_channel")
         savejson(serverid, server_name, "server_name")
 
         dataindexdict = None
@@ -761,20 +762,18 @@ async def on_message(ctx, arg):
         if "None" == arg or "none" == arg or "False" == arg or "false" == arg:
 
                 custom_welcome_message = None
-
                 send_welcome_message = False
 
-                print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
                 await ctx.send(f"Icy won't send the welcome message when a user joins the server")
+
+                print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
         elif "True" == arg or "true" == arg:
                 
                 send_welcome_message = True
+                await ctx.send(f"The following message is set as the welcome message: \"{custom_welcome_message}\"")# confirms the command in the chat
 
                 print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                await ctx.send(f"The following message is set as the welcome message: \"{custom_welcome_message}\"")# confirms the command in the chat
 
         else:
                 heat_up_message = "please give a valid input(true/false/none)"
