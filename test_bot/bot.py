@@ -744,7 +744,7 @@ async def on_message(ctx, arg):
 
 
 @bot.command(name="setwelcomemessage")
-async def on_message(ctx, arg):
+async def on_message(ctx, arg, *message):
 
         global custom_welcome_message
         global send_welcome_message
@@ -757,7 +757,7 @@ async def on_message(ctx, arg):
         custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
         send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
 
-        custom_welcome_message = extract_string(arg)# gets the message given by user and sets it as the global varriable
+        custom_welcome_message = extract_string(message)# gets the message given by user and sets it as the global varriable
 
         if "None" == arg or "none" == arg or "False" == arg or "false" == arg:
 
@@ -846,7 +846,7 @@ async def on_message(ctx, arg):
                 send_welcome_gif = True
 
                 try:
-                        title = "The following gif will be used as welcoming gif:")
+                        title = "The following gif will be used as welcoming gif:"
 
                         embeded = discord.Embed(title=title, description="", color=0x5fb79d)
                         embeded.set_image(url=custom_welcome_gif)
