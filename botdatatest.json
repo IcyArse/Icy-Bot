@@ -46,7 +46,7 @@
                                 "send_welcome_emote": true,
                                 "custom_welcome_thumbnail": null,
                                 "send_welcome_thumbnail": true,
-                                "send_welcome_dm": false,
+                                "send_welcome_dm": true,
                                 "custom_welcome_dm": null,
                                 "autoroles": [],
                                 "goodbye_channel": null,

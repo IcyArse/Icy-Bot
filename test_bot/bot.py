@@ -690,7 +690,7 @@ async def on_member_remove(member):
 
 
 @bot.command(name="setwelcomechannel")
-async def on_message(ctx, arg):
+async def on_message(ctx, arg: discord.TextChannel=None):
 
         global welcome_channel
         global server_name
@@ -756,6 +756,7 @@ async def on_message(ctx, arg, *message):
 
         custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
         send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
+        print("MESSAGE:", message)
 
         custom_welcome_message = extract_string(message)# gets the message given by user and sets it as the global varriable
 
@@ -776,7 +777,9 @@ async def on_message(ctx, arg, *message):
                 print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
 
         else:
-                heat_up_message = "please give a valid input(true/false/none)"
+                heat_up_message = dedent("""please give a valid input(true/false/none)
+                
+                used as: icy setwelcomemessage \{True/False/None\} \{Welcome Message\}""")
 
                 embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
                 await ctx.send(embed=embeded)
@@ -788,31 +791,8 @@ async def on_message(ctx, arg, *message):
 
 
 
-@bot.command(name="resetwelcomemessage")
-async def on_message(ctx):
-
-        global send_welcome_message
-
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-        send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
-
-        # a way to go back to the defualt welcome message
-        send_welcome_message = True
-        
-
-        print(f"command: \"resetwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        await ctx.send(f"Icy will send the default message as the welcome message")# confirms the command in the chat
-
-        savejson(serverid, send_welcome_message, "send_welcome_message")
-        dataindexdict = None
-
-
-
 @bot.command(name="setwelcomegif")
-async def on_message(ctx, arg):
+async def on_message(ctx, arg, giflink=None):
 
         global custom_welcome_gif
         global send_welcome_gif
@@ -840,10 +820,9 @@ async def on_message(ctx, arg):
                 await ctx.send("Icy will add a gif in the welcome message")
 
 
-        else:
+        if giflink != None:
                 
-                custom_welcome_gif = arg
-                send_welcome_gif = True
+                custom_welcome_gif = giflink
 
                 try:
                         title = "The following gif will be used as welcoming gif:"
