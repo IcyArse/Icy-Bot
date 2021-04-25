@@ -54,6 +54,7 @@ if True:
         custom_welcome_dm = None
 
         welcome_channel = None
+        welcome_title = None
         send_welcome_message = True
         custom_welcome_message = None
         send_welcome_gif = True
@@ -64,6 +65,7 @@ if True:
         custom_welcome_thumbnail = None
 
         goodbye_channel = None
+        goodbye_title = None
         send_goodbye_message = True
         custom_goodbye_message = None
         send_goodbye_gif = True
@@ -208,12 +210,11 @@ def default_json(guild):
         
         global welcome_channel
 
+        global welcome_title
         global custom_welcome_message
-        global send_welcome_gif
-        global custom_welcome_gif
         global send_welcome_message
-        global welcome_member_count_show
-        global send_welcome_emote
+        global custom_welcome_gif
+        global send_welcome_gif
         global custom_welcome_thumbnail
         global send_welcome_thumbnail
         global send_welcome_dm
@@ -222,12 +223,11 @@ def default_json(guild):
 
         global goodbye_channel
 
+        global goodbye_title
         global custom_goodbye_message
-        global send_goodbye_gif
-        global custom_goodbye_gif
         global send_goodbye_message
-        global goodbye_member_count_show
-        global send_goodbye_emote
+        global custom_goodbye_gif
+        global send_goodbye_gif
         global custom_goodbye_thumbnail
         global send_goodbye_thumbnail
 
@@ -254,12 +254,11 @@ def default_json(guild):
         savejson(serverid, guild.name, "server_name")
 
         savejson(serverid, welcome_channel, "welcome_channel")
+        savejson(serverid, welcome_title, "welcome_title")
         savejson(serverid, custom_welcome_message, "custom_welcome_message")
         savejson(serverid, send_welcome_gif, "send_welcome_gif")
         savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
         savejson(serverid, send_welcome_message, "send_welcome_message")
-        savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
-        savejson(serverid, send_welcome_emote, "send_welcome_emote")
         savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
         savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
         savejson(serverid, send_welcome_dm, "send_welcome_dm")
@@ -267,12 +266,11 @@ def default_json(guild):
         savejson(serverid, autoroles, "autoroles")
 
         savejson(serverid, goodbye_channel, "goodbye_channel")
+        savejson(serverid, goodbye_title, "goodbye_title")
         savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
-        savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
-        savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
         savejson(serverid, send_goodbye_message, "send_goodbye_message")
-        savejson(serverid, goodbye_member_count_show, "goodbye_member_count_show")
-        savejson(serverid, send_goodbye_emote, "send_goodbye_emote")
+        savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
+        savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
         savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
         savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
 
@@ -381,6 +379,7 @@ async def on_member_join(member):
 
         global welcome_channel
 
+        global welcome_title
         global custom_welcome_message
         global send_welcome_gif
         global custom_welcome_gif
@@ -403,6 +402,7 @@ async def on_member_join(member):
         if True:                
 
                 welcome_channel           = getjson(serverid, welcome_channel, "welcome_channel")
+                welcome_title             = getjson(serverid, welcome_title, "welcome_title")
                 custom_welcome_message    = getjson(serverid, custom_welcome_message, "custom_welcome_message")
                 send_welcome_gif          = getjson(serverid, send_welcome_gif, "send_welcome_gif")
                 custom_welcome_gif        = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
@@ -419,14 +419,10 @@ async def on_member_join(member):
                 dataindexdict = None
 
         # gets the server object using the server name got from the welcome_channel function
-        server = discord.utils.get(bot.guilds, name=server_name)
+        server = member.guild
 
 
         if welcome_channel:
-
-                welcome_channel = discord.utils.get(member.guild.channels, id=int(welcome_channel))# converts the channel id into a channel object
-
-                print(welcome_channel)
 
                 member_number = len(server.members)# gets the number of members in the server
 
@@ -436,14 +432,20 @@ async def on_member_join(member):
                         welcome_message_text = None
                 else:
 
-                        # the default welcome message to be used when custom message isn't given
-                        welcome_message_text = f"WELCOMEEEE to {server.name}, glad to have you here and hope you enjoy your stay"
-
                         # when welcome message is set up
                         if custom_welcome_message:
+
                                 # checks if there is a custom message given by the admin when a user enters
                                 welcome_message_text = custom_welcome_message
 
+                        else:
+
+                                # the default welcome message to be used when custom message isn't given
+                                welcome_message_text = dedent(f"""**Welcome {member}**
+                                WELCOMEEEE to {server.name}, glad to have you here and hope you enjoy your stay
+                                **server now has {member_number} members!!!**
+                                (>̃ ㅅ<̃)
+                                """)
 
 
                 # all the default welcome gifs
@@ -457,44 +459,11 @@ async def on_member_join(member):
 
 
                 title = f"WELCOME TO {server.name}"# the main title for welcome message
-                name = f"Welcome {member.name}#{member.discriminator}"# welcomes the user with the full username
-                members = f"**server now has {member_number} members!!!**"# variable for the new member count of the server(can be removed)
 
+                if welcome_title:
+                        title = welcome_title
 
-
-                embeded = discord.Embed(title=title, description=None, color=0x8871bf)# sets the title
-
-
-                # customizing the member count and the emoji thingy and adding the welcome message in the embed
-                if send_welcome_emote and welcome_member_count_show:
-
-                        # when all the varriables are to be sent
-                        value = welcome_message_text + "\n" + members + "\n" + "(>̃ ㅅ<̃)"
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main welocme message and shows the number of members and the emoji thingy
-                elif send_welcome_emote and not welcome_member_count_show:
-
-                        # when the emote and the message is to be sent without the member count
-                        value = welcome_message_text + "\n" + "(>̃ ㅅ<̃)"
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main welocme message and shows only the the emoji thingy
-                elif not send_welcome_emote and welcome_member_count_show:
-
-                        # when only the member count and the message is to be sent without the emote
-                        value = welcome_message_text + "\n" + members
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main welocme message and shows the number of members and not the emoji thingy
-                else:
-
-                        # when both the emote and the member left count is removed
-                        if not welcome_message_text:
-                                name = "**" + name + "**"
-
-                                embeded = discord.Embed(title=title, description=name, color=0x8871bf)# sets the title
-                        else:
-                                value = welcome_message_text
-                        
-                                embeded.add_field(name=name, value=value, inline=False)# the main welocme message
+                embeded = discord.Embed(title=title, description=welcome_message_text, color=0x8871bf)# sets the title
 
                 if send_welcome_thumbnail:
 
@@ -519,7 +488,7 @@ async def on_member_join(member):
                         embeded.set_image(url=welcome_gif)# sets the gif as the main image in embed
 
 
-                await welcome_channel.send(embed=embeded)
+                await bot.get_channel(int(welcome_channel)).send(embed=embeded)
 
 
         # checks if the autoroles are setted up
@@ -532,10 +501,11 @@ async def on_member_join(member):
 
         if send_welcome_dm:
 
-                dm_text = f'Hiiiiiiiiiii {member.name}, welcomeeeeeeeee to {member.guild.name}, hope you enjoy your stay :)'
-
                 if custom_welcome_dm:
                         dm_text = custom_welcome_dm
+
+                else:
+                        dm_text = f'Hiiiiiiiiiii {member.name}, welcomeeeeeeeee to {member.guild.name}, hope you enjoy your stay :)'
                 
                 await member.create_dm()# creates a dm channel with the new user
                 await member.dm_channel.send(
@@ -553,6 +523,7 @@ async def on_member_remove(member):
 
         global goodbye_channel
 
+        global goodbye_title
         global custom_goodbye_message
         global send_goodbye_gif
         global custom_goodbye_gif
@@ -571,6 +542,7 @@ async def on_member_remove(member):
         if True:
 
                 goodbye_channel           = getjson(serverid, goodbye_channel, "goodbye_channel")
+                goodbye_title             = getjson(serverid, goodbye_title, "goodbye_title")
                 custom_goodbye_message    = getjson(serverid, custom_goodbye_message, "custom_goodbye_message")
                 send_goodbye_gif          = getjson(serverid, send_goodbye_gif, "send_goodbye_gif")
                 custom_goodbye_gif        = getjson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
@@ -584,12 +556,10 @@ async def on_member_remove(member):
                 dataindexdict = None
 
         # gets the server object using the server name recieved from the welcome/goodbye channel command
-        server = discord.utils.get(bot.guilds, name=server_name)
+        server = member.guild
 
 
         if goodbye_channel:
-
-                goodbye_channel = discord.utils.get(server.channels, id=int(goodbye_channel))# converts the channel id into a channel object
 
                 member_number = len(server.members)# gets the number of server members
 
@@ -600,7 +570,11 @@ async def on_member_remove(member):
                 else:
 
                         # the default goodbye message to be used when custom message isn't given
-                        goodbye_message_text = f"Goodbye {member.name}, hope you enjoyed your stay"
+                        goodbye_message_text = dedent(f"""**Goodbye {member}**
+                        Goodbye {member.name}, hope you enjoyed your stay
+                        **now we have {member_number} members left**
+                        ( ╥︣ ﹏ ╥︣ )
+                        """)
 
                         # when goodbye message is set up
                         if custom_goodbye_message:
@@ -619,44 +593,12 @@ async def on_member_remove(member):
 
 
                 title = f"{member.name} left {server.name}..."# the main title of the goodbye message
-                name = f"Goodbye {member.name}#{member.discriminator}"# says goodbye to the user
-                members = f"now we have {member_number} members left"# variable to show the remaining member count(can be turned off)
 
+                if goodbye_title:
+                        title = goodbye_title
 
-
-                embeded = discord.Embed(title=title, description=None, color=0x8871bf)# sets the title
+                embeded = discord.Embed(title=title, description=goodbye_message_text, color=0x8871bf)# sets the title
                 
-
-                # customizing the member count and the emoji thingy and adding the goodbye message in the embed
-                if send_goodbye_emote and goodbye_member_count_show:
-
-                        # when all the varriables are to be sent
-                        value = goodbye_message_text + "\n" + members + "\n" + "( ╥︣ ﹏ ╥︣ )"
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main goodbye message and shows the number of members and the emoji thingy
-                elif send_goodbye_emote and not goodbye_member_count_show:
-
-                        # when the emote and the message is to be sent without the member count
-                        value = goodbye_message_text + "\n" + "( ╥︣ ﹏ ╥︣ )"
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main goodbye message and shows only the the emoji thingy
-                elif not send_goodbye_emote and goodbye_member_count_show:
-
-                        # when only the member count and the message is to be sent without the emote
-                        value = goodbye_message_text + "\n" + members
-
-                        embeded.add_field(name=name, value=value, inline=False)# the main goodbye message and shows the number of members and not the emoji thingy
-                else:
-
-                        # when both the emote and the member left count is removed
-                        if not goodbye_message_text:
-                                name = "**" + name + "**"
-
-                                embeded = discord.Embed(title=title, description=name, color=0x8871bf)# sets the title
-                        else:
-                                value = goodbye_message_text
-                        
-                                embeded.add_field(name=name, value=value, inline=False)# the main goodbye message
 
                 if send_goodbye_thumbnail:
 
@@ -681,7 +623,7 @@ async def on_member_remove(member):
                         embeded.set_image(url=goodbye_gif)# sets the gif as the main image in embed
 
 
-                await goodbye_channel.send(embed=embeded)
+                await bot.get_channel(int(goodbye_channel)).send(embed=embeded)
 
 
 
@@ -708,7 +650,7 @@ async def on_message(ctx, arg: discord.TextChannel=None):
         server_name = getjson(serverid, server_name, "server_name")
         server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
 
-        if "None" == arg or "none" == arg:
+        if "None" == arg or "none" == arg or arg == None:
 
                 welcome_channel = None
                 print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
@@ -743,257 +685,107 @@ async def on_message(ctx, arg: discord.TextChannel=None):
 
 
 
-@bot.command(name="setwelcomemessage")
-async def on_message(ctx, arg, *message):
+@bot.command(name="welcome")
+async def welcome(ctx, field=None, value=None):
+
+        global welcome_channel
+        global server_name
+
+        global welcome_title
 
         global custom_welcome_message
         global send_welcome_message
 
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-
-
-        custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
-        send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
-        print("MESSAGE:", message)
-
-        custom_welcome_message = extract_string(message)# gets the message given by user and sets it as the global varriable
-
-        if "None" == arg or "none" == arg or "False" == arg or "false" == arg:
-
-                custom_welcome_message = None
-                send_welcome_message = False
-
-                await ctx.send(f"Icy won't send the welcome message when a user joins the server")
-
-                print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        elif "True" == arg or "true" == arg:
-                
-                send_welcome_message = True
-                await ctx.send(f"The following message is set as the welcome message: \"{custom_welcome_message}\"")# confirms the command in the chat
-
-                print(f"command: \"setwelcomemessage\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        else:
-                heat_up_message = dedent("""please give a valid input(true/false/none)
-                
-                used as: icy setwelcomemessage \{True/False/None\} \{Welcome Message\}""")
-
-                embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-                await ctx.send(embed=embeded)
-
-        savejson(serverid, custom_welcome_message, "custom_welcome_message")
-        savejson(serverid, send_welcome_message, "send_welcome_message")
-
-        dataindexdict = None
-
-
-
-@bot.command(name="setwelcomegif")
-async def on_message(ctx, arg, giflink=None):
-
         global custom_welcome_gif
         global send_welcome_gif
 
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-
-        custom_welcome_gif = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
-        send_welcome_gif = getjson(serverid, send_welcome_gif, "send_welcome_gif")
-
-        print(f"command: \"setwelcomegif\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-        if "None" == arg or "none" == arg:
-
-                send_welcome_gif = False
-
-                await ctx.send("Icy won't add a gif in the welcome message")
-
-
-        elif "True" == arg or "True" == arg:
-
-                send_welcome_gif = True
-
-                await ctx.send("Icy will add a gif in the welcome message")
-
-
-        if giflink != None:
-                
-                custom_welcome_gif = giflink
-
-                try:
-                        title = "The following gif will be used as welcoming gif:"
-
-                        embeded = discord.Embed(title=title, description="", color=0x5fb79d)
-                        embeded.set_image(url=custom_welcome_gif)
-                        await ctx.send(embed=embeded)
-
-                except:
-                        heat_up_message = "Invalid link. Please make sure to give the link of the gif location"
-
-                        embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-                        await ctx.send(embed=embeded)
-
-        savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
-        savejson(serverid, send_welcome_gif, "send_welcome_gif")
-
-        dataindexdict = None
-
-
-
-@bot.command(name="showwelcomemembercount")
-async def on_message(ctx, *args):
-
-        global welcome_member_count_show
-
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-
-        welcome_member_count_show = getjson(serverid, welcome_member_count_show, "welcome_member_count_show")
-
-        if "True" in args[0] or "true" in args[0]:
-                welcome_member_count_show = True
-
-                print(f"command: \"showwelcomemembercount\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy will add the number of members left to the message")
-        
-        elif "False" in args[0] or "false" in args[0]:
-                welcome_member_count_show = False
-
-                print(f"command: \"showwelcomemembercount\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy won't add the number of members left to the message")
-
-        else:
-                heat_up_message = "Please make sure that the input is either \"True\" or \"False\""
-                embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-
-                print(f"command: \"showwelcomemembercount\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                await ctx.send(embed=embeded)
-
-        savejson(serverid, welcome_member_count_show, "welcome_member_count_show")
-
-        dataindexdict = None
-
-
-
-@bot.command(name="sendwelcomeemote")
-async def on_message(ctx, *args):
-
-        global send_welcome_emote
-
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-
-        send_welcome_emote = getjson(serverid, send_welcome_emote, "send_welcome_emote")
-
-        if "True" in args[0] or "true" in args[0]:
-                send_welcome_emote = True
-
-                print(f"command: \"sendwelcomeemote\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy will add the emoticon in the welcome message")
-
-        elif "False" in args[0] or "false" in args[0]:
-                send_welcome_emote = False
-
-                print(f"command: \"sendwelcomeemote\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy won't add the emoticon in the welcome message")
-
-        else:
-                heat_up_message = "Please make sure that the input is either \"True\" or \"False\""
-                embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-
-                print(f"command: \"sendwelcomeemote\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                await ctx.send(embed=embeded)
-
-        savejson(serverid, send_welcome_emote, "send_welcome_emote")
-
-        dataindexdict = None
-
-
-
-@bot.command(name="setwelcomethumbnail")
-async def on_message(ctx, *args):
-
         global custom_welcome_thumbnail
-
-        global dataindexdict
-
-        serverid = str(ctx.author.guild.id)
-
-        custom_welcome_thumbnail = getjson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
-
-        if "None" in args[0] or "none" in args[0]:
-                custom_welcome_thumbnail = None
-
-                print(f"command: \"setwelcomethumbnail\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy will add the user profile picture as the thumbnail, to stop that use command: \"icy removewelcomethumbnail\"")
-
-        else:
-
-                custom_welcome_thumbnail = args[0]
-
-                print(f"command: \"setwelcomethumbnail\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                
-                try:
-                        await ctx.send("The following image will be used as the welcome thumbnail:")
-                        await ctx.send(url=custom_goodbye_thumbnail)
-
-                except:
-                        heat_up_message = "Invalid link. Please make sure that the image location is correct"
-                        embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-
-                        await ctx.send(embed=embeded)
-
-        savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
-
-        dataindexdict = None
-
-
-
-@bot.command(name="sendwelcomethumbnail")
-async def on_message(ctx, *args):
-
         global send_welcome_thumbnail
 
         global dataindexdict
 
-        serverid = str(ctx.author.guild.id)
+        if field == "channel":
+                serverid = str(ctx.author.guild.id)
 
-        send_welcome_thumbnail = getjson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                welcome_channel = getjson(serverid, welcome_channel, "welcome_channel")
+                server_name = getjson(serverid, server_name, "server_name")
 
-        if "True" in args[0] or "true" in args[0]:
-                send_welcome_thumbnail = True
+                server_name = ctx.author.guild.name
+                savejson(serverid, server_name, "server_name")
 
-                print(f"command: \"sendwelcomethumbnail\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy will add the thumbnail in the welcome message")
+                if value == None:
+                        welcome_channel = None
+                        savejson(serverid, welcome_channel, "welcome_channel")
 
-        elif "False" in args[0] or "false" in args[0]:
-                send_welcome_thumbnail = False
+                else:
+                        welcome_channel = extract_channel(value)
+                        savejson(serverid, welcome_channel, "welcome_channel")
 
-                print(f"command: \"sendwelcomethumbnail\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-                await ctx.send("Icy won't add the thumbnail in the welcome message")
+        elif field == "title":
+                serverid = str(ctx.author.guild.id)
 
-        else:
-                heat_up_message = "Please make sure that the input is either \"True\" or \"False\""
-                embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
+                welcome_title = getjson(serverid, welcome_title, "welcome_title")
+                welcome_title = value
 
-                print(f"command: \"sendwelcomethumbnail\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
+                savejson(serverid, welcome_title, "welcome_title")
 
-                await ctx.send(embed=embeded)
+        elif field == "message":
+                serverid = str(ctx.author.guild.id)
 
-        savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                custom_welcome_message = getjson(serverid, custom_welcome_message, "custom_welcome_message")
+                send_welcome_message = getjson(serverid, send_welcome_message, "send_welcome_message")
 
+                if value == None:
+                        send_welcome_message = False
+                        custom_welcome_message = None
+                        savejson(serverid, send_welcome_message, "send_welcome_message")
+
+                else:
+                        send_welcome_message = True
+                        custom_welcome_message = dedent(value)
+
+                        savejson(serverid, custom_welcome_message, "custom_welcome_message")
+                        savejson(serverid, send_welcome_message, "send_welcome_message")
+
+                        print("MESSAGE:", custom_welcome_message)
+
+        elif field == "image":
+                serverid = str(ctx.author.guild.id)
+
+                custom_welcome_gif = getjson(serverid, custom_welcome_gif, "custom_welcome_gif")
+                send_welcome_gif = getjson(serverid, send_welcome_gif, "send_welcome_gif")
+
+                if value == None:
+                        send_welcome_gif = False
+                        custom_welcome_gif = None
+                        savejson(serverid, send_welcome_gif, "send_welcome_gif")
+
+                else:
+                        send_welcome_gif = True
+                        custom_welcome_gif = value
+
+                        savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
+                        savejson(serverid, send_welcome_gif, "send_welcome_gif")
+
+        elif field == "thumbnail":
+                serverid = str(ctx.author.guild.id)
+
+                custom_welcome_thumbnail = getjson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+                send_welcome_thumbnail = getjson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+
+                if value == None:
+                        send_welcome_thumbnail = False
+                        custom_welcome_thumbnail = None
+                        savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+
+                else:
+                        send_welcome_thumbnail = True
+                        custom_welcome_thumbnail = value
+
+                        savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
+                        savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+        
         dataindexdict = None
-
-
 
 
 
@@ -3004,28 +2796,34 @@ async def on_message(ctx):
 @bot.command(name="welp", help="testing command")
 async def on_message(ctx):
 
-        print("JOINED")
+        embed = discord.Embed(title="welp")
+        embed.set_thumbnail(url=None)
+        await ctx.send(embed=embed)
 
-        image_link = "https://media.discordapp.net/attachments/814539604472496168/823988886082420796/20210323_203731.gif"
-        title = "welcome to __hanako__ <3"
-        content = dedent(f"""
-        <@!{ctx.author.id}>
+        await ctx.send(ctx.author)
 
-        ,, <#807544089016401931>
-        ,, <#824269867166203955>
-        ,, <#807559580863299604>
-
-        """)
-
-        welcome_embed = discord.Embed(title=title, description=content, colour=0x2f3136)
-        welcome_embed.set_thumbnail(url=image_link)
-
-        channel = await commands.TextChannelConverter().convert(ctx, str(783340598706569229))
-        #print(f"{member.name} has joined Welcome! 😊 ")
-        #channel = discord.utils.get(member.guild.text_channels, name="welcome and goodbyes")
-        #await channel.send(f"{member.mention} has joined! 😊")
-
-        await channel.send(embed=welcome_embed)
+        #print("JOINED")
+#
+        #image_link = "https://media.discordapp.net/attachments/814539604472496168/823988886082420796/20210323_203731.gif"
+        #title = "welcome to __hanako__ <3"
+        #content = dedent(f"""
+        #<@!{ctx.author.id}>
+#
+        #,, <#807544089016401931>
+        #,, <#824269867166203955>
+        #,, <#807559580863299604>
+#
+        #""")
+#
+        #welcome_embed = discord.Embed(title=title, description=content, colour=0x2f3136)
+        #welcome_embed.set_thumbnail(url=image_link)
+#
+        #channel = await commands.TextChannelConverter().convert(ctx, str(783340598706569229))
+        ##print(f"{member.name} has joined Welcome! 😊 ")
+        ##channel = discord.utils.get(member.guild.text_channels, name="welcome and goodbyes")
+        ##await channel.send(f"{member.mention} has joined! 😊")
+#
+        #await channel.send(embed=welcome_embed)
 
         #global testvar
         #global dataindexdict
