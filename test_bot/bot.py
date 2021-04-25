@@ -631,60 +631,6 @@ async def on_member_remove(member):
 
 
 
-@bot.command(name="setwelcomechannel")
-async def on_message(ctx, arg: discord.TextChannel=None):
-
-        global welcome_channel
-        global server_name
-        global default_join
-
-        global dataindexdict
-
-
-        serverid = str(ctx.author.guild.id)
-        server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
-
-        welcome_channel = getjson(serverid, welcome_channel, "welcome_channel")
-        welcome_channel = extract_channel(arg)# gets the channel id from the arguments
-
-        server_name = getjson(serverid, server_name, "server_name")
-        server_name = ctx.author.guild.name# gets the server name and sets it as the global varriable
-
-        if "None" == arg or "none" == arg or arg == None:
-
-                welcome_channel = None
-                print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                await ctx.send("Icy will not send any welcome messages")
-                savejson(serverid, welcome_channel, "welcome_channel")
-
-        else:
-
-                welcome_channel = extract_channel(arg[0])# gets the channel id from the arguments
-                savejson(serverid, welcome_channel, "welcome_channel")
-
-
-                try:
-                        try_this = await commands.TextChannelConverter().convert(ctx, welcome_channel)# converts the channel id into a channel object
-
-
-                        print(f"command: \"setwelcomechannel\" sent by:{ctx.author} time:{ctx.message.created_at}")# confirms the command and prints info in the terminal
-
-                        await ctx.send(f"<#{welcome_channel}> channel will recieve the welcome messages")# confirms the command in the chat
-
-                except:
-                        heat_up_message = "The given channel doesn't exists, please make sure to tag the channel correctely"
-
-                        embeded = discord.Embed(title="Icy's heating up..", description=heat_up_message, color=0x5fb79d)
-                        await ctx.send(embed=embeded)
-
-
-        savejson(serverid, server_name, "server_name")
-
-        dataindexdict = None
-
-
-
 @bot.command(name="welcome")
 async def welcome(ctx, field=None, value=None):
 
