@@ -575,6 +575,7 @@ async def on_member_remove(member):
 
 
 @bot.command(name="welcome")
+@commands.has_permissions(manage_guild=True)
 async def welcome(ctx, field=None, *, value=None):
 
         global welcome_channel
@@ -700,6 +701,7 @@ async def welcome(ctx, field=None, *, value=None):
 
 
 @bot.command(name="goodbye")
+@commands.has_permissions(manage_guild=True)
 async def welcome(ctx, field=None, *, value=None):
 
         global goodbye_channel
@@ -825,6 +827,7 @@ async def welcome(ctx, field=None, *, value=None):
 
 
 @bot.command(name="autorole")
+@commands.has_permissions(manage_guild=True)
 async def on_message(ctx, task, role: discord.Role):
 
         global autoroles
@@ -901,6 +904,7 @@ async def on_message(ctx, *, given):
 
 #suggestion accepted
 @bot.command(name="accept", help="posts your suggestion in the chat in a better way \nformat: icy accept <suggestion no> <reason>")
+@commands.has_permissions(manage_guild=True)
 async def on_message(ctx, suggestion_number, *, reason):
 
         global suggestions
@@ -936,6 +940,7 @@ async def on_message(ctx, suggestion_number, *, reason):
 
 #suggestion denied
 @bot.command(name="deny", help="posts your suggestion in the chat in a better way")
+@commands.has_permissions(manage_guild=True)
 async def on_message(ctx, suggestion_number, *, reason):
 
         global suggestions
@@ -971,6 +976,7 @@ async def on_message(ctx, suggestion_number, *, reason):
 
 #suggestion considering
 @bot.command(name="consider", help="posts your suggestion in the chat in a better way")
+@commands.has_permissions(manage_guild=True)
 async def on_message(ctx, suggestion_number, *, reason):
 
         global suggestions
@@ -1232,7 +1238,6 @@ async def on_message(ctx, member: discord.Member):
 
         savejson(serverid, muted_user_roles, "muted_user_roles")
         dataindexdict = None
-
 
 
 
@@ -1761,9 +1766,6 @@ async def on_message(ctx, *args):
 
 
 
-
-
-
 #sends the avatar of the sender
 @bot.command(name="av", help="shows your beautiful face")
 async def on_message(ctx, *args):
@@ -1826,10 +1828,6 @@ async def on_message(ctx, *args):
 
 
 
-
-
-
-#
 @bot.command(name="showerthought")
 async def on_message(ctx):
 
@@ -1857,7 +1855,6 @@ async def on_message(ctx):
 
 
 
-#
 @bot.command(name="meme")
 async def on_message(ctx):
 
@@ -1882,7 +1879,6 @@ async def on_message(ctx):
 
 
 
-#
 @bot.command(name="cat")
 async def on_message(ctx):
 
@@ -1904,6 +1900,7 @@ async def on_message(ctx):
         embeded.set_image(url=cat_url)
 
         await ctx.send(embed=embeded)
+
 
 
 
