@@ -13,6 +13,7 @@ import pytz
 import time
 import datetime
 import sched
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from textwrap import dedent
 
@@ -35,6 +36,7 @@ reddit = praw.Reddit(
         user_agent=REDDIT_USER_AGENT,
 )
 
+scheduler = AsyncIOScheduler()
 
 intents = discord.Intents.default()# sets intents as an instant if intents
 intents.members = True# sets intents for members true so we use members from the server
@@ -373,6 +375,7 @@ def default_json(guild):
         global autoroles
 
         global muterole
+        global muted_user_roles
 
         global suggestion_num
         global suggestions
@@ -850,11 +853,10 @@ async def on_message(ctx, task, role: discord.Role):
 
 #suggestion
 @bot.command(name="suggest", help="posts your suggestion in the chat in a better way")
-async def on_message(ctx, *args):
+async def on_message(ctx, *, given):
 
         global suggestion_num# gets the global varriable to have the latest number of suggestion in
         global suggestions# the global dictionary to store suggestion info respect to their number
-
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
@@ -862,18 +864,11 @@ async def on_message(ctx, *args):
         suggestion_num = getjson(serverid, suggestion_num, "suggestion_num")
         suggestions = getjson(serverid, suggestions, "suggestions")
 
-        welp = args
-        sug = ""
-
-        # extracts the main suggestion
-        for i in welp:
-                sug = sug + i + " "# contains the suggestion
-
         suggestion_num = suggestion_num + 1# adds a number to add a suggestion number for the new suggestion
 
         title = f"Suggestion #{str(suggestion_num)} by {ctx.author}"
         suggested = "Suggestion: "
-        suggestion = sug# the main suggestion
+        suggestion = given
 
         #adds the info in the suggestions info dictionary with name and the suggestion
         suggestion_info = {
@@ -881,12 +876,8 @@ async def on_message(ctx, *args):
                 "suggestion": suggestion,
         }
 
-
         embeded = discord.Embed(title=title, description="", color=0xe12c7b)# creates the embed
         embeded.add_field(name=suggested, value=suggestion, inline=False)# adds the field contaning the suggestion
-
-
-        print(f"command: \"suggestion\" sent by:{ctx.author} time:{ctx.message.created_at}")
 
         await ctx.message.delete()# deletes the original message
 
@@ -895,47 +886,31 @@ async def on_message(ctx, *args):
 
         message = await commands.MessageConverter().convert(ctx, sent_id)# converts the id into the message object
 
+        await message.add_reaction("⬆️")# adds the reaction to the message
+        await message.add_reaction("⬇️")# adds the reaction to the message
+
         # creates an dictionary with associating the suggestion number with suggestion info creating a nested dictionary
         current_suggestion = {suggestion_num : suggestion_info}
         suggestions.update(current_suggestion)
 
-
-        await message.add_reaction("⬆️")# adds the reaction to the message
-        await message.add_reaction("⬇️")# adds the reaction to the message
-
         savejson(serverid, suggestion_num, "suggestion_num")
         savejson(serverid, suggestions, "suggestions")
-
         dataindexdict = None
 
 
 
 #suggestion accepted
 @bot.command(name="accept", help="posts your suggestion in the chat in a better way \nformat: icy accept <suggestion no> <reason>")
-async def on_message(ctx, *args):
+async def on_message(ctx, suggestion_number, *, reason):
 
-        global suggestions# imports the global dictionary containing the suggestions
-
+        global suggestions
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
         suggestions = getjson(serverid, suggestions, "suggestions")
 
-        welp = list(args)
-
-        suggestion_number = welp[0]# gets the suggestion number from the content of the message
-        welp.pop(0)# removes the number from the list so it can be used to extract the reason
-
-        reason = ""
-
-        # extracts the reason from the content list
-        for i in welp:
-                reason = reason + i + " "
-
-
         try:
-
                 suggestion_number = str(suggestion_number)# converts the suggestion number to int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
@@ -949,48 +924,28 @@ async def on_message(ctx, *args):
                 embeded.add_field(name="Reason for acceptance: ", value=reason, inline=False)# adds the field containing the reason for acceptance
 
         except:
-
-                # if the suggestion isn't present in the suggestions dictionary
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x090202)
-
-
-        print(f"command: \"accept\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
         savejson(serverid, suggestions, "suggestions")
-
         dataindexdict = None
 
 
 
 #suggestion denied
 @bot.command(name="deny", help="posts your suggestion in the chat in a better way")
-async def on_message(ctx, *args):
+async def on_message(ctx, suggestion_number, *, reason):
 
-        global suggestions# imports the global dictionary containing the suggestions
-
+        global suggestions
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
         suggestions = getjson(serverid, suggestions, "suggestions")
 
-        welp = list(args)
-
-        suggestion_number = welp[0]# gets the suggestion number from the content of the message
-        welp.pop(0)# removes the suggestion number from the content list
-
-        reason = ""
-
-        # extracts the reason from the content list
-        for i in welp:
-                reason = reason + i + " "
-
-
         try:
-
                 suggestion_number = str(suggestion_number)# converts the suggestion number to an int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
@@ -1004,47 +959,28 @@ async def on_message(ctx, *args):
                 embeded.add_field(name="Reason for denial: ", value=reason, inline=False)# adds the field containing the reason
 
         except:
-
-                # if the suggestion doesn't exists in the main suggestion dictionary
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x090202)
-
-
-        print(f"command: \"deny\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
         savejson(serverid, suggestions, "suggestions")
-
         dataindexdict = None
 
 
 
 #suggestion considering
 @bot.command(name="consider", help="posts your suggestion in the chat in a better way")
-async def on_message(ctx, *args):
+async def on_message(ctx, suggestion_number, *, reason):
 
-        global suggestions# imports the global dictionary containing the suggestions
-
+        global suggestions
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
         suggestions = getjson(serverid, suggestions, "suggestions")
 
-        welp = list(args)
-
-        suggestion_number = welp[0]# gets the suggestion number form the message content
-        welp.pop(0)# removes the suggestion number from the list containing the message content
-
-        reason = ""
-
-        # extracts the reason from the content list
-        for i in welp:
-                reason = reason + i + " "
-
         try:
-
                 suggestion_number = str(suggestion_number)# converts suggestion number to an int datatype
 
                 suggester_name = suggestions.get(suggestion_number).get("name")# gets the name from the nested dictionary
@@ -1058,18 +994,12 @@ async def on_message(ctx, *args):
                 embeded.add_field(name="Reason for consideration: ", value=reason, inline=False)# adds the field containing the reason
 
         except:
-
-                # if the suggestion doesn't exists in the main suggestions dictionary
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x090202)
-
-
-        print(f"command: \"consider\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
 
         savejson(serverid, suggestions, "suggestions")
-
         dataindexdict = None
 
 
@@ -1080,27 +1010,17 @@ async def on_message(ctx, *args):
 
 #mute role
 @bot.command(name="muterole", help="sets the mute role for the bot", pass_context=True)
-async def on_message(ctx, *args):
-
-        global muterole# umports the global varriable so it can again be used in the mute function
+async def on_message(ctx, muterole: discord.Role):
 
         global muted_user_roles
-
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
-        muterole = getjson(serverid, muterole, "muterole")
-
-        mentioned_role = args
-
-        muterole = extract_user_and_role(mentioned_role[0])# sets the muterole as mentioned by user in the message
-
+        muterole_id = getjson(serverid, muterole, "muterole")
 
         try :
-                role = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
                 permissions = discord.Permissions()# sets permissions as a Permissions object from discord lib
-
 
                 # contains all the values for the permissions for the role and updates them in the permissions object
                 permissions.update(
@@ -1137,20 +1057,18 @@ async def on_message(ctx, *args):
                         ban_members=False,
                 )
 
-                await role.edit(reason=None, color=0xd7090b, permissions=permissions)# changes the roles perms according to perms mentioned in the permissions tuple
-
-                description = f"{mentioned_role} has been set up as the mute role"# description for the embed
-                embeded = discord.Embed(title="Mute Role Setted Up", description=description, color=0x2ca26f)# creates the embed
+                await muterole.edit(reason=None, color=0xd7090b, permissions=permissions)
+                
+                muterole_id = muterole.id
+                description = f"{muterole} has been set up as the mute role"# description for the embed
+                embeded = discord.Embed(title="Mute Role Setted Up", description=description, color=0x2f3136)# creates the embed
 
         except:
-                embeded = discord.Embed(title="ERROR", description="Role doesn't exists", color=0x090202)# for the end case where the role entered by user doesn't exists
-
-
-        print(f"command: \"muterole\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                embeded = discord.Embed(title="ERROR", description="Role doesn't exists", color=0x2f3136)
 
         await ctx.send(embed=embeded)# sends the embed in the chat
 
-        savejson(serverid, muterole, "muterole")
+        savejson(serverid, muterole_id, "muterole")
         savejson(serverid, muted_user_roles, "muted_user_roles")
 
         dataindexdict = None
@@ -1159,76 +1077,53 @@ async def on_message(ctx, *args):
 
 #mute
 @bot.command(name="mute", help="mute's the mentioned user")
-async def on_message(ctx, *args):
-
-        global muterole# gets the global varriable consisting the mute role
+async def on_message(ctx, member: discord.Member, *time_list):
 
         global muted_user_roles
-
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
         muterole = getjson(serverid, muterole, "muterole")
-        savejson(serverid, {}, "muted_user_roles")
-
         muted_user_roles = getjson(serverid, muted_user_roles, "muted_user_roles")
 
+        muterole = await commands.RoleConverter().convert(ctx, str(muterole))
 
-        muterole_obj = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
-
-        mentioned_user = args
-        userid = extract_user_and_role(mentioned_user[0])# gets the userid from the mentioned user string format
-
-
-        time_of_message = ctx.message.created_at# gets the time at which the message was sent by author
-
-        delay = list(args)# converts the context of the message into a list
-        delay.pop(0)# removes the mentioned user
+        time_of_message = ctx.message.created_at
+        delay = list(time_list)
 
         reason = ""
+        timedelta = datetime.timedelta()
 
-        timedelta = datetime.timedelta()# creates an empty time lenght to be added into later
-
-
-        # block to extract the time
-        for i in delay:# selects each word from the delay which were split by spaces in the original message
-
-                # if the content is in the format of time
+        for i in delay:
                 try :
-
                         stripped = int(i[:-1])# main check for the try function for time format
 
-
-                        if "d" in i or "D" in i:# the day gap
-
+                        if "d" in i or "D" in i:
                                 stripped = int(i[:-1])# slices the last part of the string which will only leave an int part
                                                       # as the input will only consist <number of time><which level> and as level
                                                       # is only one letter it slices it off and leaves a number
 
-                                timedays = datetime.timedelta(days=stripped)# sets the timedays to the no of days in the stripped
-                                timedelta = timedelta + timedays# adds the time gap in timedays to the main time gap "timedelta"
+                                timedays = datetime.timedelta(days=stripped)
+                                timedelta = timedelta + timedays
 
-                        elif "h" in i or "H" in i:# the hour gap
+                        elif "h" in i or "H" in i:
+                                stripped = int(i[:-1])
 
-                                stripped = int(i[:-1])# slices the last part of the string which will only leave an int part
-
-                                timehours = datetime.timedelta(hours=stripped)# sets the timehours to the no of hours in the stripped
-                                timedelta = timedelta + timehours# adds the time gap in timehours to the main time gap "timedelta"
+                                timehours = datetime.timedelta(hours=stripped)
+                                timedelta = timedelta + timehours
 
                         elif "m" in i or "M" in i:
+                                stripped = int(i[:-1])
 
-                                stripped = int(i[:-1])# slices the last part of the string which will only leave an int part
-
-                                timeminutes = datetime.timedelta(minutes=stripped)# sets the timeminutes to the no of minutes in the stripped
-                                timedelta = timedelta + timeminutes# adds the time gap in timeminutes to the main time gap "timedelta"
+                                timeminutes = datetime.timedelta(minutes=stripped)
+                                timedelta = timedelta + timeminutes
 
                         elif "s" in i or "S" in i:
+                                stripped = int(i[:-1])
 
-                                stripped = int(i[:-1])# slices the last part of the string which will only leave an int part
-
-                                timeseconds = datetime.timedelta(seconds=stripped)# sets the timeseconds to the no of seconds in the stripped
-                                timedelta = timedelta + timeseconds# adds the time gap in timeseconds to the main time gap "timedelta"
+                                timeseconds = datetime.timedelta(seconds=stripped)
+                                timedelta = timedelta + timeseconds
 
                 except:
                         reason = i# if the content isn't in the format of time it adds it to the reason string
@@ -1236,36 +1131,28 @@ async def on_message(ctx, *args):
 
         time_unmute = time_of_message + timedelta# time to unmute the user
 
+        time_unmute_local = time_unmute.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Kolkata"))
+        time_unmute_local = str(time_unmute_local)[0:19]
 
-        # block to mute and time the unmute
         try:
-
-                member = await commands.MemberConverter().convert(ctx, userid)# converts userid into a member object
-
                 muted_user_role_ids = []
 
                 mentioned_roles_list = member.roles
                 mentioned_roles_list.pop(0)
 
-
                 for i in mentioned_roles_list:
-
                         await member.remove_roles(i)
                         muted_user_role_ids.append(i.id)
 
+                await member.add_roles(muterole)# adds the muterole to the member
 
-                await member.add_roles(muterole_obj)# adds the muterole to the member
+                muted_user_roles.update({str(member.id): muted_user_role_ids})# will only happen when muted indefinitely
 
-                # if no time is mentioned
                 if time_unmute == time_of_message:
-
                         title = f"{member.name} muted"
                         desc = f"{member.name} has been muted indefinitely"
 
-                        muted_user_roles.update({member.id: muted_user_role_ids})# will only happen when muted indefinitely
-
-
-                        embeded = discord.Embed(title=title, description=desc, color=0xd60e11)# creates the ember
+                        embeded = discord.Embed(title=title, description=desc, color=0x2f3136)# creates the ember
 
                         if reason:
                                 embeded.add_field(name="Reason", value=reason, inline=False)# adds the reason field to the embed if reason is given
@@ -1273,91 +1160,76 @@ async def on_message(ctx, *args):
                         await ctx.send(embed=embeded)# sends the embed in the chat
 
                 else :
-
                         title = f"{member.name} muted"
                         desc = f"{member.name} has been muted for {timedelta}"
 
-
-                        embeded = discord.Embed(title=title, description=desc, color=0xd60e11)# creates the embed
+                        embeded = discord.Embed(title=title, description=desc, color=0x2f3136)# creates the embed
 
                         if reason:
                                 embeded.add_field(name="Reason", value=reason, inline=False)# adds the reason field to the embed if reason is given
 
                         await ctx.send(embed=embeded)# sends the embed in the chat
 
-                        print(f"command: \"mute\" sent by:{ctx.author} time:{ctx.message.created_at}")
+                        async def return_roles():
+                                try:
+                                        for i in mentioned_roles_list:
+                                                await member.add_roles(i)
 
-                        time.sleep(timedelta.total_seconds())
+                                        await member.remove_roles(muterole)# removes the muterole from the user
+                                except:
+                                        pass
 
-                        for i in mentioned_roles_list:
-                        
-                                await member.add_roles(i)
+                                muted_user_roles.pop(str(member.id))
+                                await ctx.send(f"{member.name} has been unmuted")# confirms the unmute in the chat
 
 
-                        await member.remove_roles(muterole_obj)# removes the muterole from the user
-                        await ctx.send(f"{member.name} is unmuted")# confirms the unmute in the chat
-
+                        scheduler.add_job(return_roles, 'date', run_date=time_unmute_local)
+                        scheduler.start()
 
         except:
-
-                # if any error occurs in the try
-                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exist or used in wrong format.", color=0x090202)
-                print(f"command: \"mute\" sent by:{ctx.author} time:{ctx.message.created_at}")
-
+                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exist or used in wrong format.", color=0x2f3136)
                 await ctx.send(embed=embeded)# sends the embed in the chat
 
         savejson(serverid, muted_user_roles, "muted_user_roles")
-
         dataindexdict = None
 
 
 
 #unmute
 @bot.command(name="unmute", help="unmutes the mentioned user")
-async def on_message(ctx, *args):
-
-        global muterole# gets the global mute role
+@commands.has_permissions(mute_members=True)
+async def on_message(ctx, member: discord.Member):
 
         global muted_user_roles
-
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
 
-        muted_user_roles = getjson(serverid, muted_user_roles, "muted_user_roles")
         muterole = getjson(serverid, muterole, "muterole")
+        muted_user_roles = getjson(serverid, muted_user_roles, "muted_user_roles")
 
-        user_id = extract_user_and_role(args[0])# gets the user id
-
-        muterole_obj = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
+        muterole = await commands.RoleConverter().convert(ctx, str(muterole))# converts muterole to a role object
 
         try:
-                # converts the id into the member object
-                member = await commands.MemberConverter().convert(ctx, user_id)
-
-                mentioned_roles_id_list = muted_user_roles.get(str(member.id))
-
+                member_roles_id_list = muted_user_roles.get(str(member.id))
                 muted_user_roles.pop(str(member.id))
 
                 # removes the mute role from user
-                await member.remove_roles(muterole_obj)
+                await member.remove_roles(muterole)
 
-                for i in mentioned_roles_id_list:
-
-                        role = await commands.RoleConverter().convert(ctx, str(i))
+                for role_id in member_roles_id_list:
+                        role = await commands.RoleConverter().convert(ctx, str(role_id))
                         await member.add_roles(role)
 
                 await ctx.send(f"{member.name} has been unmuted")
+                member_roles_id_list = []
 
         except:
-                # if the mentioned user is invalid
-                embeded = discord.Embed(title="ERROR", description="mentioned user doesn't exists or isn't muted", color=0x090202)
+                embeded = discord.Embed(title="Something's wrong...", description="mentioned user doesn't exists or isn't muted", color=0x090202)
                 await ctx.send(embed=embeded)
 
         savejson(serverid, muted_user_roles, "muted_user_roles")
-
         dataindexdict = None
-
 
 
 
