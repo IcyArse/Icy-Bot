@@ -1010,6 +1010,7 @@ async def on_message(ctx, suggestion_number, *, reason):
 
 #mute role
 @bot.command(name="muterole", help="sets the mute role for the bot", pass_context=True)
+@commands.has_permissions(mute_members=True)
 async def on_message(ctx, muterole: discord.Role):
 
         global muted_user_roles
@@ -1077,6 +1078,7 @@ async def on_message(ctx, muterole: discord.Role):
 
 #mute
 @bot.command(name="mute", help="mute's the mentioned user")
+@commands.has_permissions(mute_members=True)
 async def on_message(ctx, member: discord.Member, *time_list):
 
         global muted_user_roles
@@ -1905,19 +1907,11 @@ async def on_message(ctx):
 
 
 
-
-
-
-
 #...
 @bot.command(name="daddy", command_prefix="", help="well....")
 async def on_message(ctx):
 
         await ctx.send()
-
-
-
-
 
 
 
@@ -2012,10 +2006,6 @@ async def on_message(ctx, *args):
 
 
 
-
-
-
-
 #make the bot send a message to the mentioned user unless they are in the server
 @bot.command(name="message", help="sends a message to the mentioned user")
 async def on_message(ctx, *args):
@@ -2040,20 +2030,12 @@ async def on_message(ctx, *args):
 
 
 
-
-
-
-
 #in development
 @bot.command(name="snipe", help="in development")
 async def on_message(ctx):
         guild = discord.utils.get(bot.guilds, name=GUILD)# gets the guilds name
 
         await ctx.send("guild.auditlog")
-
-
-
-
 
 
 
@@ -2230,11 +2212,6 @@ async def create_channel(ctx, name):
                 print(f'Creating new channel: {name}')
                 await guild.create_text_channel(name)# creates the channel
                 await ctx.send('> done')
-
-
-
-
-
 
 
 
