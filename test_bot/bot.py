@@ -1262,6 +1262,9 @@ async def on_message(ctx, member: discord.Member):
 
 
 
+
+
+
 #greets the member in weird ways
 @bot.command(name="hey", help="greets for you because your stupid ass is too lazy")
 async def on_message(ctx, member: discord.Member=None):
@@ -1550,7 +1553,6 @@ async def on_message(ctx, member: discord.Member=None):
 
 
 
-
 #sends the avatar of the sender
 @bot.command(name="av", help="shows your beautiful face")
 async def on_message(ctx, member: discord.Member=None):
@@ -1587,7 +1589,7 @@ async def on_message(ctx, member: discord.Member=None):
 
 
 
-#--COMPLETED--
+
 
 
 
@@ -1595,25 +1597,21 @@ async def on_message(ctx, member: discord.Member=None):
 async def on_message(ctx):
 
         global thoughtlimit
-
-        showerthoughts_sub = reddit.subreddit("Showerthoughts")
-
-        author_name = None
-        try:
-                author_name = {ctx.author.nick}
-        except:
-                author_name = {ctx.author.name}
+        
+        if ctx.author.nick:
+                author_name = ctx.author.nick
+        else:
+                author_name = ctx.author.name
 
         thought = None
-        name = f"Thought for you {author_name} is,"
-
         thoughtlimit += 1
+        showerthoughts_sub = reddit.subreddit("Showerthoughts")
+        name = f"Thought for {author_name} is,"
+
         for submission in showerthoughts_sub.hot(limit=thoughtlimit):
                 thought = submission.title
 
-        embeded = discord.Embed(name=name, description="", color=0xe07265)
-        embeded.add_field(name=thought, value="have fun ^^- ye idk what to say here", inline=False)
-
+        embeded = discord.Embed(name=name, description=thought, color=0xe07265)
         await ctx.send(embed=embeded)
 
 
@@ -1627,15 +1625,13 @@ async def on_message(ctx):
 
         meme_title = None
         meme_url = None
-        meme_score = None
 
         memelimit += 1
         for meme in meme_sub.hot(limit=memelimit):
                 meme_title = meme.title
                 meme_url = meme.url
-                meme_score = meme.score
 
-        embeded = discord.Embed(title=meme_title, description="", color=0xe07265)
+        embeded = discord.Embed(title=meme_title, description=f"[pathway]({meme_url})", color=0xe07265)
         embeded.set_image(url=meme_url)
 
         await ctx.send(embed=embeded)
@@ -1651,27 +1647,23 @@ async def on_message(ctx):
 
         cat_title = None
         cat_url = None
-        cat_score = None
 
         catlimit += 1
         for cat in cat_sub.hot(limit=catlimit):
                 cat_title = cat.title
                 cat_url = cat.url
-                cat_score = cat.score
 
-        embeded = discord.Embed(title=cat_title, description="", color=0xe07265)
+        embeded = discord.Embed(title=cat_title, description=f"[pathway]({cat_url})", color=0xe07265)
         embeded.set_image(url=cat_url)
 
         await ctx.send(embed=embeded)
 
 
 
-
 #...
 @bot.command(name="daddy", command_prefix="", help="well....")
 async def on_message(ctx):
-
-        await ctx.send()
+        await ctx.send("..")
 
 
 
@@ -1766,37 +1758,12 @@ async def on_message(ctx, *args):
 
 
 
-#make the bot send a message to the mentioned user unless they are in the server
-@bot.command(name="message", help="sends a message to the mentioned user")
-async def on_message(ctx, *args):
-
-        rest = list(args)# sets the rest as the rest of the message
-        mentioned = rest[0]# take out the part that's supposed to contain the mentioned user
-
-        rest.pop(0)# pops out the mentioned
-
-        message_content = " "
-        for i in rest:
-                message_content = message_content + " " + i
-
-
-        message_final = f"{mentioned}{message_content}"
-
-
-        print(f"command: \"message\" sent by:{ctx.author} time:{ctx.message.created_at}")
-
-        await ctx.message.delete()# deletes the original message
-        await ctx.send(message_final)# sends the final message
 
 
 
-#in development
-@bot.command(name="snipe", help="in development")
-async def on_message(ctx):
         guild = discord.utils.get(bot.guilds, name=GUILD)# gets the guilds name
 
         await ctx.send("guild.auditlog")
-
 
 
 #test function
@@ -1956,7 +1923,7 @@ async def on_message(ctx):
 
 
 
-
+#--COMPLETED--
 
 
 
