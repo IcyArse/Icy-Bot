@@ -609,10 +609,12 @@ async def welcome(ctx, field=None, *, value=None):
                 if value == None:
                         welcome_channel = None
                         savejson(serverid, welcome_channel, "welcome_channel")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
                 else:
                         welcome_channel = extract_channel(value)
                         savejson(serverid, welcome_channel, "welcome_channel")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
         elif field == "title":
                 serverid = str(ctx.author.guild.id)
@@ -621,6 +623,7 @@ async def welcome(ctx, field=None, *, value=None):
                 welcome_title = value
 
                 savejson(serverid, welcome_title, "welcome_title")
+                ctx.send("This will be the welcome message:", embed=welcome_show())
 
         elif field == "message":
                 serverid = str(ctx.author.guild.id)
@@ -632,6 +635,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_welcome_message = False
                         custom_welcome_message = None
                         savejson(serverid, send_welcome_message, "send_welcome_message")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
                 else:
                         send_welcome_message = True
@@ -639,8 +643,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_welcome_message, "custom_welcome_message")
                         savejson(serverid, send_welcome_message, "send_welcome_message")
-
-                        print("MESSAGE:", custom_welcome_message)
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
         elif field == "image":
                 serverid = str(ctx.author.guild.id)
@@ -652,6 +655,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_welcome_gif = False
                         custom_welcome_gif = None
                         savejson(serverid, send_welcome_gif, "send_welcome_gif")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
                 else:
                         send_welcome_gif = True
@@ -659,6 +663,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_welcome_gif, "custom_welcome_gif")
                         savejson(serverid, send_welcome_gif, "send_welcome_gif")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
         elif field == "thumbnail":
                 serverid = str(ctx.author.guild.id)
@@ -670,6 +675,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_welcome_thumbnail = False
                         custom_welcome_thumbnail = None
                         savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
                 else:
                         send_welcome_thumbnail = True
@@ -677,6 +683,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_welcome_thumbnail, "custom_welcome_thumbnail")
                         savejson(serverid, send_welcome_thumbnail, "send_welcome_thumbnail")
+                        ctx.send("This will be the welcome message:", embed=welcome_show())
 
         elif field == "dm":
                 serverid = str(ctx.author.guild.id)
@@ -688,6 +695,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_welcome_dm = False
                         custom_welcome_dm = None
                         savejson(serverid, send_welcome_dm, "send_welcome_dm")
+                        ctx.send(f"Icy won't send any message when a user joins")
 
                 else:
                         send_welcome_dm = True
@@ -695,6 +703,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_welcome_dm, "custom_welcome_dm")
                         savejson(serverid, send_welcome_dm, "send_welcome_dm")
+                        ctx.send(f"Icy will send the message when a user joins:\n {custom_goodbye_dm}")
 
         dataindexdict = None
 
@@ -735,10 +744,12 @@ async def welcome(ctx, field=None, *, value=None):
                 if value == None:
                         goodbye_channel = None
                         savejson(serverid, goodbye_channel, "goodbye_channel")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
                 else:
                         goodbye_channel = extract_channel(value)
                         savejson(serverid, goodbye_channel, "goodbye_channel")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
         elif field == "title":
                 serverid = str(ctx.author.guild.id)
@@ -747,6 +758,7 @@ async def welcome(ctx, field=None, *, value=None):
                 goodbye_title = value
 
                 savejson(serverid, goodbye_title, "goodbye_title")
+                ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
         elif field == "message":
                 serverid = str(ctx.author.guild.id)
@@ -758,6 +770,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_goodbye_message = False
                         custom_goodbye_message = None
                         savejson(serverid, send_goodbye_message, "send_goodbye_message")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
                 else:
                         send_goodbye_message = True
@@ -765,8 +778,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_goodbye_message, "custom_goodbye_message")
                         savejson(serverid, send_goodbye_message, "send_goodbye_message")
-
-                        print("MESSAGE:", custom_goodbye_message)
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
         elif field == "image":
                 serverid = str(ctx.author.guild.id)
@@ -778,6 +790,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_goodbye_gif = False
                         custom_goodbye_gif = None
                         savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
                 else:
                         send_goodbye_gif = True
@@ -785,6 +798,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_goodbye_gif, "custom_goodbye_gif")
                         savejson(serverid, send_goodbye_gif, "send_goodbye_gif")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
         elif field == "thumbnail":
                 serverid = str(ctx.author.guild.id)
@@ -796,6 +810,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_goodbye_thumbnail = False
                         custom_goodbye_thumbnail = None
                         savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
 
                 else:
                         send_goodbye_thumbnail = True
@@ -803,6 +818,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_goodbye_thumbnail, "custom_goodbye_thumbnail")
                         savejson(serverid, send_goodbye_thumbnail, "send_goodbye_thumbnail")
+                        ctx.send("This will be the goodbye message:", embed=goodbye_show())
         
         elif field == "dm":
                 serverid = str(ctx.author.guild.id)
@@ -814,6 +830,7 @@ async def welcome(ctx, field=None, *, value=None):
                         send_goodbye_dm = False
                         custom_goodbye_dm = None
                         savejson(serverid, send_goodbye_dm, "send_goodbye_dm")
+                        ctx.send("Icy won't send the message when a user leaves")
 
                 else:
                         send_goodbye_dm = True
@@ -821,6 +838,7 @@ async def welcome(ctx, field=None, *, value=None):
 
                         savejson(serverid, custom_goodbye_dm, "custom_goodbye_dm")
                         savejson(serverid, send_goodbye_dm, "send_goodbye_dm")
+                        ctx.send(f"Icy will send the message when a user leaves:\n {custom_goodbye_dm}")
 
         dataindexdict = None
 
@@ -928,7 +946,7 @@ async def on_message(ctx, suggestion_number, *, reason):
                 embeded.add_field(name="Reason for acceptance: ", value=reason, inline=False)# adds the field containing the reason for acceptance
 
         except:
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
+                embeded = discord.Embed(title="Icy's heating up..", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
@@ -964,7 +982,7 @@ async def on_message(ctx, suggestion_number, *, reason):
                 embeded.add_field(name="Reason for denial: ", value=reason, inline=False)# adds the field containing the reason
 
         except:
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
+                embeded = discord.Embed(title="Icy's heating up..", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
@@ -1000,7 +1018,7 @@ async def on_message(ctx, suggestion_number, *, reason):
                 embeded.add_field(name="Reason for consideration: ", value=reason, inline=False)# adds the field containing the reason
 
         except:
-                embeded = discord.Embed(title="ERROR", description="suggestion doesn't exists", color=0x2f3136)
+                embeded = discord.Embed(title="Icy's heating up..", description="suggestion doesn't exists", color=0x2f3136)
 
         await ctx.message.delete()# deletes the original message
         await ctx.send(embed=embeded)# sends the embed in the chat
@@ -1088,6 +1106,7 @@ async def on_message(ctx, muterole: discord.Role):
 async def on_message(ctx, member: discord.Member, *time_list):
 
         global muted_user_roles
+        global muterole
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
@@ -1209,6 +1228,7 @@ async def on_message(ctx, member: discord.Member, *time_list):
 async def on_message(ctx, member: discord.Member):
 
         global muted_user_roles
+        global muterole
         global dataindexdict
 
         serverid = str(ctx.author.guild.id)
@@ -1240,7 +1260,7 @@ async def on_message(ctx, member: discord.Member):
         dataindexdict = None
 
 
-
+#--COMPLETED--
 
 
 #greets the member in weird ways
